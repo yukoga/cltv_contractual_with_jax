@@ -1,0 +1,14 @@
+{
+    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/lib/python3.8/site-packages/pyarrow",
+    ],
+    "javascript.suggest.enabled": false,
+    "typescript.suggest.enabled": false,
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+}
