@@ -58,11 +58,12 @@ def toy_data(N, params, rv_key):
         'loglik': jnp.sum(jstats.beta.logpdf(_y, alpha, beta))
     }
 
-    # _y = random.geom(rv_key, theta, (N,))
+    _y = jnp.ceil(jnp.log(random.uniform(rv_key, (N, ))) / jnp.log1p(- theta))
     dist['geom'] = {
         'theta': theta,
-        # 'rv': _y,
-        # 'loglik': jnp.sum(jstats.geom.logpmf(_y, theta))
+        'rv': _y,
+        'pmf': jstats.geom.pmf(_y, theta),
+        'loglik': jnp.sum(jstats.geom.logpmf(_y, theta))
     }
 
     del _x, _y
