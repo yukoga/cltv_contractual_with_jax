@@ -69,7 +69,7 @@ def test_rv_samples(data):
     _x, _y = data['normal']['rv']
 
     samples, _ = rv_samples(mu, sigma, rv_key, _x.shape[0])
-    assert round(samples.mean()) == mu, f'Mean of standard normal distribution should be close to {mu}.'
-    f'but {round(samples.mean())}.'
-    assert round(samples.std()) == sigma, f'Variance of standard normal distribution should be close to {sigma}.'
-    f'but {round(samples.std())}.'
+    assert round(samples.mean()) == mu, f'Mean of standard normal distribution should be '
+    f'close to {mu}, but {round(samples.mean())}.'
+    assert round(samples.std()) == sigma, f'Variance of standard normal distribution should be '
+    f'close to {sigma}, but {round(samples.std())}.'

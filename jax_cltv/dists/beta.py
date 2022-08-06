@@ -18,18 +18,18 @@
 import jax.numpy as jnp
 import jax.random as random
 from jax_cltv.dists.bases import BaseContinuousDist
-from jax.scipy.stats import norm
+from jax.scipy.stats import beta
 
 
-class Normal(BaseContinuousDist):
+class Beta(BaseContinuousDist):
     def __init__(self,
-                 loc:jnp.DeviceArray =0.,
-                 scale:jnp.DeviceArray =1.) -> BaseContinuousDist:
-        self.loc = loc
-        self.scale = scale
+                 a:jnp.DeviceArray =1.,
+                 b:jnp.DeviceArray =1.) -> BaseContinuousDist:
+        self.a = a
+        self.b = b
 
     def logpdf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
-        """ Calc log-pdf of normal distribution for given data.
+        """ Calc log-pdf of beta distribution for given data.
         and probability distribution in log pdf form.
         
         Parameters
@@ -41,12 +41,12 @@ class Normal(BaseContinuousDist):
         -------
         log-likelihood at data x: jnp.DeviceArray with a scalar value.
         """
-        return norm.logpdf(x, loc=self.loc, scale=self.scale)
+        return beta.logpdf(x, a=self.a, b=self.b)
 
-    def sample(self, rng_key:
-               jnp.DeviceArray,
+    def sample(self,
+               rng_key: jnp.DeviceArray,
                size: int) -> jnp.DeviceArray:
-        """ Generate random values from a normal distribution. 
+        """ Generate random values from a beta distribution. 
         
         Parameters
         ----------
@@ -62,74 +62,74 @@ class Normal(BaseContinuousDist):
         if not isinstance(rng_key, jnp.DeviceArray):
             rng_key = random.PRNGKey(rng_key)
 
-        return self.loc + self.scale * random.normal(rng_key, (size,))
+        return random.beta(rng_key, self.a, self.b, (size,))
 
 
 def loglikelihood(x: jnp.DeviceArray,
-                  loc: jnp.DeviceArray,
-                  scale: jnp.DeviceArray) -> tuple:
-    """ Calc log-likelihood of the normal distribution for given data.
+                  a: jnp.DeviceArray,
+                  b: jnp.DeviceArray) -> tuple:
+    """ Calc log-likelihood of the beta distribution for given data.
     
     Parameters
     ----------
     x: array_like
         observed data in the form of 1-D vector.
-    loc: array_like
-        location parameter in the form of (D, N) array where N is sample size
+    a: array_like
+        The first shape parameter in the form of (D, N) array where N is sample size
         and D is dimension size.
-    scale: array_like
-        scale parameter in the form of (N,) array where N is sample size.
+    b: array_like
+        2nd shape parameter in the form of (N,) array where N is sample size.
 
     Returns
     -------
-    (loglikelihood, Normal): tuple
-        log-likelihood for given data x: jnp.DeviceArray with a scalar value
+    (loglikelihood, Beta): tuple
+        log-likelihood for given data x: jnp.DeviceArray with shape parameters 
         and
-        the instance of Normal distribution for given parameters.
+        the instance of Beta distribution for given parameters.
     """
-    d = Normal(loc, scale)
+    d = Beta(a, b)
     return d.loglikelihood(x), d
 
 
 def neg_loglikelihood(x: jnp.DeviceArray,
-                      loc: jnp.DeviceArray,
-                      scale: jnp.DeviceArray) -> tuple:
-    """ Calc negative log-likelihood of the normal distribution for given data.
+                      a: jnp.DeviceArray,
+                      b: jnp.DeviceArray) -> tuple:
+    """ Calc negative log-likelihood of the beta distribution for given data.
     
     Parameters
     ----------
     x: array_like
         observed data in the form of 1-D vector.
-    loc: array_like
-        location parameter in the form of (D, N) array where N is sample size
+    a: array_like
+        The first shape parameter in the form of (D, N) array where N is sample size
         and D is dimension size.
-    scale: array_like
-        scale parameter in the form of (N,) array where N is sample size.
+    b: array_like
+        2nd shape parameter in the form of (N,) array where N is sample size.
 
     Returns
     -------
-    (neg_loglikelihood, Normal): tuple
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value
+    (neg_loglikelihood, Beta): tuple
+        negative log-likelihood for given data x: jnp.DeviceArray with shape parameters 
         and
-        the instance of Normal distribution for given parameters.
+        the instance of Beta distribution for given parameters.
     """
-    d = Normal(loc, scale)
+    d = Beta(a, b)
     return d.negloglikelihood(x), d
 
 
-def rv_samples(loc: jnp.DeviceArray = 0.,
-               scale: jnp.DeviceArray = 1.,
+def rv_samples(a: jnp.DeviceArray = 1.,
+               b: jnp.DeviceArray = 1.,
                rng_key: jnp.DeviceArray = 1,
                size=100) -> tuple:
-    """ Generate random values from a normal distribution. 
+    """ Generate random values from a beta distribution. 
     
     Parameters
     ----------
-    loc: array_like
-        location parameter in the form of (D, N) array where N is sample size
+    a: array_like
+        The first shape parameter in the form of (D, N) array where N is sample size
         and D is dimension size.
-    scale: array_like
-        scale parameter in the form of (N,) array where N is sample size.
+    b: array_like
+        2nd shape parameter in the form of (N,) array where N is sample size.
     rng_key: int or array_like
         random key in the form of PRNG key or integer.
     size: int or tuple of shape.
@@ -137,10 +137,10 @@ def rv_samples(loc: jnp.DeviceArray = 0.,
 
     Returns
     -------
-    (samples, Normal): tuple
-        random values sampleing from Normal distribution specified by given parameters
+    (samples, Beta): tuple
+        random values sampleing from Beta distribution specified by given parameters
         and
-        the instance of Normal distribution for given parameters.
+        the instance of Beta distribution for given parameters.
     """
-    d = Normal(loc, scale)
+    d = Beta(a, b)
     return d.sample(rng_key, size), d

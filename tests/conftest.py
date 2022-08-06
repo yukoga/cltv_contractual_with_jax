@@ -27,7 +27,7 @@ N = 100 # number of samples.
 params = {
     'mu': 1.,       # location parameter for normal distribution.
     'sigma': 2.,    # scale parameter for normal distribution.
-    'alpha': 2.,    # First shape parameter for beta distribution.
+    'alpha': 1.,    # First shape parameter for beta distribution.
     'beta': 1.,     # Second shape parameter for beta distribution.
     'theta': .5     # Probability for specific event happen after some trials.
 }
@@ -54,6 +54,7 @@ def toy_data(N, params, rv_key):
     dist['beta'] = {
         'alpha': alpha, 'beta': beta,
         'rv': _y,
+        'pdf': jstats.beta.pdf(_y, alpha, beta),
         'loglik': jnp.sum(jstats.beta.logpdf(_y, alpha, beta))
     }
 
