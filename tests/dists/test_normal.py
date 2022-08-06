@@ -16,7 +16,8 @@
 # ==============================================================================
 
 
-from jax_cltv.dists.normal import (Normal, loglikelihood, neg_loglikelihood) 
+from jax_cltv.dists.normal import (
+    Normal, loglikelihood, neg_loglikelihood, rv_samples) 
 
 
 def test_instantiate(data):
@@ -49,15 +50,14 @@ def test_neg_loglikelihood(data):
     f' {neg_loglik_true} is expected, but {neg_loglik} is.'
 
 
-def test_sample(data):
+def test_rv_samples(data):
     rv_key = data['key']
     mu = data['normal']['mu']
     sigma = data['normal']['sigma']
     _x, _y = data['normal']['rv']
 
-    nd = Normal(mu, sigma)
-    sample = nd.sample(rv_key, size=10000)
-    assert round(sample.mean()) == mu, f'Mean of standard normal distribution should be close to {mu}.'
-    f'but {round(sample.mean())}.'
-    assert round(sample.std()) == sigma, f'Variance of standard normal distribution should be close to {sigma}.'
-    f'but {round(sample.std())}.'
+    samples, _ = rv_samples(mu, sigma, rv_key, _x.shape[0])
+    assert round(samples.mean()) == mu, f'Mean of standard normal distribution should be close to {mu}.'
+    f'but {round(samples.mean())}.'
+    assert round(samples.std()) == sigma, f'Variance of standard normal distribution should be close to {sigma}.'
+    f'but {round(samples.std())}.'

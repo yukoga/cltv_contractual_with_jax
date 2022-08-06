@@ -43,7 +43,22 @@ class Normal(BaseContinuousDist):
         """
         return norm.logpdf(x, loc=self.loc, scale=self.scale)
 
-    def sample(self, rng_key=1, size=100):
+    def sample(self, rng_key:
+               jnp.DeviceArray,
+               size: int) -> jnp.DeviceArray:
+        """ Generate random values from a normal distribution. 
+        
+        Parameters
+        ----------
+        rng_key: int or array_like
+            random key in the form of PRNG key or integer.
+        size: int or tuple of shape.
+            the number of random variables.
+
+        Returns
+        -------
+        samples: sampled random values in the form of jnp.DeviceArray.
+        """
         if not isinstance(rng_key, jnp.DeviceArray):
             rng_key = random.PRNGKey(rng_key)
 
@@ -51,8 +66,8 @@ class Normal(BaseContinuousDist):
 
 
 def loglikelihood(x: jnp.DeviceArray,
-                  loc=jnp.DeviceArray,
-                  scale=jnp.DeviceArray) -> tuple:
+                  loc: jnp.DeviceArray,
+                  scale: jnp.DeviceArray) -> tuple:
     """ Calc log-likelihood of the normal distribution for given data.
     
     Parameters
@@ -77,8 +92,8 @@ def loglikelihood(x: jnp.DeviceArray,
 
 
 def neg_loglikelihood(x: jnp.DeviceArray,
-                      loc=jnp.DeviceArray,
-                      scale=jnp.DeviceArray) -> tuple:
+                      loc: jnp.DeviceArray,
+                      scale: jnp.DeviceArray) -> tuple:
     """ Calc negative log-likelihood of the normal distribution for given data.
     
     Parameters
@@ -100,3 +115,27 @@ def neg_loglikelihood(x: jnp.DeviceArray,
     """
     d = Normal(loc, scale)
     return d.negloglikelihood(x), d
+
+
+def rv_samples(loc: jnp.DeviceArray = 0.,
+               scale: jnp.DeviceArray = 1.,
+               rng_key: jnp.DeviceArray = 1,
+               size=100) -> tuple:
+    """ Generate random values from a normal distribution. 
+    
+    Parameters
+    ----------
+    rng_key: int or array_like
+        random key in the form of PRNG key or integer.
+    size: int or tuple of shape.
+        the number of random variables.
+
+    Returns
+    -------
+    (samples, Normal): tuple
+        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value
+        and
+        the instance of Normal distribution for given parameters.
+    """
+    d = Normal(loc, scale)
+    return d.sample(rng_key, size), d
