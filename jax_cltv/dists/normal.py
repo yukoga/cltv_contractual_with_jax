@@ -133,7 +133,7 @@ def rv_samples(loc: jnp.DeviceArray = 0.,
     Returns
     -------
     (samples, Normal): tuple
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value
+        random values sampleing from Normal distribution specified by given parameters
         and
         the instance of Normal distribution for given parameters.
     """

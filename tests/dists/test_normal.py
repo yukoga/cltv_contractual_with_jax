@@ -26,6 +26,18 @@ def test_instantiate(data):
     f'but {d.__class__.__name__}.'
 
 
+def test_normal_pdf(data):
+    mu = data['normal']['mu']
+    sigma = data['normal']['sigma']
+    _x, _y = data['normal']['rv']
+    pdf_true = data['normal']['pdf']
+    d = Normal(mu, sigma)
+    pdf = d.pdf(_y)
+
+    assert (pdf_true == pdf).all(), 'pdf is wrong. '
+    f'{pdf_true} is expected, but {pdf} is.'
+
+
 def test_loglikelihood(data):
     mu = data['normal']['mu']
     sigma = data['normal']['sigma']

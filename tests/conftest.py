@@ -42,13 +42,11 @@ def toy_data(N, params, rv_key):
 
     dist = dict()
     dist['key'] = rv_key
-    # _x = random.normal(rv_key, (N, D))
-    # _y = jnp.dot(_x, w) + 1.5 * random.normal(rv_key, (N,))
     dist['normal'] = { 'mu': mu, 'sigma': sigma }
     _x = random.normal(rv_key, (N,))
-    # _y = dist['normal']['mu'] * random.normal(rv_key, (N,)) + dist['normal']['sigma'] * random.normal(rv_key, (N,))
     _y = mu + sigma * random.normal(rv_key, (N,))
     dist['normal']['rv'] = (_x, _y)
+    dist['normal']['pdf'] = jstats.norm.pdf(_y, loc=mu, scale=sigma)
     dist['normal']['loglik'] = jnp.sum(jstats.norm.logpdf(_y,
             loc=mu, scale=sigma))
 
