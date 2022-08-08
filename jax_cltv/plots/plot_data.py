@@ -22,6 +22,8 @@ from jax_cltv.dists.geom import Geometric
 
 def plot_survives(data: any,
                   theta: any=None,
+                  bins: int=10,
+                  density: bool=False,
                   style: str='ggplot',
                   figsize: tuple=(16, 9),
                   alpha: float=.4,
@@ -41,6 +43,11 @@ def plot_survives(data: any,
         Shape parameter of a geometric distribution.
         If theta is specified, you can plot pmf of a geometric distribution
         with this parameter.
+    bins: int
+        Specify bins of suvived users histogram. Default: 10.
+    density: bool
+        Specify if you'd like to plot in relative frequency.
+        False = actual number / True = plot relative freq. Default: False
     style: str
         matplotlib style. The default value is ggplot.
     figsize: tuple
@@ -63,16 +70,20 @@ def plot_survives(data: any,
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     N, D = data.shape
+    bins = bins
 
     x = np.linspace(1, D, D)
-    bins = D
+    data = data.sum(axis=1).astype('int32')
+    gd = Geometric(theta)
+    pmf = gd.pmf(x)
+    if not density:
+        pmf = pmf * N
+
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel('Durations')
     ax.set_ylabel('# of survived users.')
-    ax.hist(data.sum(axis=1).astype('int32'), bins=bins, alpha=alpha)
+    ax.hist(data, bins=bins, alpha=alpha, density=density)
     if theta:
-        gd = Geometric(theta)
-        pmf = gd.pmf(x)
-        ax.scatter(x, pmf * 100, c='k')
+        ax.scatter(x, pmf, c='k')
     
     return ax
