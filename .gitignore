@@ -127,10 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-notebooks/jax_sample.ipynb
-notebooks/sandbox.ipynb
-### https://raw.github.com/github/gitignore/218a941be92679ce67d0484547e3e142b2f5f6f0/Global/macOS.gitignore
 
+### https://raw.github.com/github/gitignore/218a941be92679ce67d0484547e3e142b2f5f6f0/Global/macOS.gitignore
 # General
 .DS_Store
 .AppleDouble
@@ -161,4 +159,8 @@ Temporary Items
 
 # output
 *.png
+data/
 
+notebooks/jax_sample.ipynb
+notebooks/sandbox.ipynb
+notebooks/archived.ipynb
