@@ -22,16 +22,16 @@ from jax.scipy.stats import norm
 
 
 class Normal(BaseContinuousDist):
-    def __init__(self,
-                 loc:jnp.DeviceArray =0.,
-                 scale:jnp.DeviceArray =1.) -> BaseContinuousDist:
+    def __init__(
+        self, loc: jnp.DeviceArray = 0.0, scale: jnp.DeviceArray = 1.0
+    ) -> BaseContinuousDist:
         self.loc = loc
         self.scale = scale
 
     def logpdf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
-        """ Calc log-pdf of normal distribution for given data.
+        """Calc log-pdf of normal distribution for given data.
         and probability distribution in log pdf form.
-        
+
         Parameters
         ----------
         x: array_like
@@ -43,11 +43,9 @@ class Normal(BaseContinuousDist):
         """
         return norm.logpdf(x, loc=self.loc, scale=self.scale)
 
-    def sample(self, rng_key:
-               jnp.DeviceArray,
-               size: int) -> jnp.DeviceArray:
-        """ Generate random values from a normal distribution. 
-        
+    def sample(self, rng_key: jnp.DeviceArray, size: int) -> jnp.DeviceArray:
+        """Generate random values from a normal distribution.
+
         Parameters
         ----------
         rng_key: int or array_like
@@ -65,11 +63,11 @@ class Normal(BaseContinuousDist):
         return self.loc + self.scale * random.normal(rng_key, (size,))
 
 
-def loglikelihood(x: jnp.DeviceArray,
-                  loc: jnp.DeviceArray,
-                  scale: jnp.DeviceArray) -> tuple:
-    """ Calc log-likelihood of the normal distribution for given data.
-    
+def loglikelihood(
+    x: jnp.DeviceArray, loc: jnp.DeviceArray, scale: jnp.DeviceArray
+) -> tuple:
+    """Calc log-likelihood of the normal distribution for given data.
+
     Parameters
     ----------
     x: array_like
@@ -91,11 +89,11 @@ def loglikelihood(x: jnp.DeviceArray,
     return d.loglikelihood(x), d
 
 
-def neg_loglikelihood(x: jnp.DeviceArray,
-                      loc: jnp.DeviceArray,
-                      scale: jnp.DeviceArray) -> tuple:
-    """ Calc negative log-likelihood of the normal distribution for given data.
-    
+def neg_loglikelihood(
+    x: jnp.DeviceArray, loc: jnp.DeviceArray, scale: jnp.DeviceArray
+) -> tuple:
+    """Calc negative log-likelihood of the normal distribution for given data.
+
     Parameters
     ----------
     x: array_like
@@ -117,12 +115,14 @@ def neg_loglikelihood(x: jnp.DeviceArray,
     return d.negloglikelihood(x), d
 
 
-def rv_samples(loc: jnp.DeviceArray = 0.,
-               scale: jnp.DeviceArray = 1.,
-               rng_key: jnp.DeviceArray = 1,
-               size=100) -> tuple:
-    """ Generate random values from a normal distribution. 
-    
+def rv_samples(
+    loc: jnp.DeviceArray = 0.0,
+    scale: jnp.DeviceArray = 1.0,
+    rng_key: jnp.DeviceArray = 1,
+    size=100,
+) -> tuple:
+    """Generate random values from a normal distribution.
+
     Parameters
     ----------
     loc: array_like

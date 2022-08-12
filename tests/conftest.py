@@ -20,57 +20,58 @@ import pytest
 import jax.numpy as jnp
 from jax import random
 from jax.scipy import stats as jstats
-from scipy.stats import geom
 
 
-N = 100 # number of samples.
+N = 100  # number of samples.
 params = {
-    'mu': 1.,       # location parameter for normal distribution.
-    'sigma': 2.,    # scale parameter for normal distribution.
-    'alpha': 1.,    # First shape parameter for beta distribution.
-    'beta': 1.,     # Second shape parameter for beta distribution.
-    'theta': .5     # Probability for specific event happen after some trials.
+    "mu": 1.0,  # location parameter for normal distribution.
+    "sigma": 2.0,  # scale parameter for normal distribution.
+    "alpha": 1.0,  # First shape parameter for beta distribution.
+    "beta": 1.0,  # Second shape parameter for beta distribution.
+    "theta": 0.5,  # Probability for specific event happen after some trials.
 }
 
 
 def toy_data(N, params, rv_key):
-    mu = params['mu']
-    sigma = params['sigma']
-    alpha = params['alpha']
-    beta = params['beta']
-    theta = params['theta']
+    mu = params["mu"]
+    sigma = params["sigma"]
+    alpha = params["alpha"]
+    beta = params["beta"]
+    theta = params["theta"]
 
     dist = dict()
-    dist['key'] = rv_key
-    dist['normal'] = { 'mu': mu, 'sigma': sigma }
+    dist["key"] = rv_key
+    dist["normal"] = {"mu": mu, "sigma": sigma}
     _x = random.normal(rv_key, (N,))
     _y = mu + sigma * random.normal(rv_key, (N,))
-    dist['normal']['rv'] = (_x, _y)
-    dist['normal']['pdf'] = jstats.norm.pdf(_y, loc=mu, scale=sigma)
-    dist['normal']['loglik'] = jnp.sum(jstats.norm.logpdf(_y,
-            loc=mu, scale=sigma))
+    dist["normal"]["rv"] = (_x, _y)
+    dist["normal"]["pdf"] = jstats.norm.pdf(_y, loc=mu, scale=sigma)
+    dist["normal"]["loglik"] = jnp.sum(
+        jstats.norm.logpdf(_y, loc=mu, scale=sigma)
+    )
 
     _y = random.beta(rv_key, alpha, beta, (N,))
-    dist['beta'] = {
-        'alpha': alpha, 'beta': beta,
-        'rv': _y,
-        'pdf': jstats.beta.pdf(_y, alpha, beta),
-        'loglik': jnp.sum(jstats.beta.logpdf(_y, alpha, beta))
+    dist["beta"] = {
+        "alpha": alpha,
+        "beta": beta,
+        "rv": _y,
+        "pdf": jstats.beta.pdf(_y, alpha, beta),
+        "loglik": jnp.sum(jstats.beta.logpdf(_y, alpha, beta)),
     }
 
-    _y = jnp.ceil(jnp.log(random.uniform(rv_key, (N, ))) / jnp.log1p(- theta))
-    dist['geom'] = {
-        'theta': theta,
-        'rv': _y,
-        'pmf': jstats.geom.pmf(_y, theta),
-        'loglik': jnp.sum(jstats.geom.logpmf(_y, theta))
+    _y = jnp.ceil(jnp.log(random.uniform(rv_key, (N,))) / jnp.log1p(-theta))
+    dist["geom"] = {
+        "theta": theta,
+        "rv": _y,
+        "pmf": jstats.geom.pmf(_y, theta),
+        "loglik": jnp.sum(jstats.geom.logpmf(_y, theta)),
     }
 
     del _x, _y
     return dist
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def data():
     rv_key = random.PRNGKey(1)
     dist = toy_data(N, params, rv_key)

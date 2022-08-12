@@ -14,9 +14,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
-
-import jax.numpy as jnp
-from jax.scipy.stats import norm as jnorm
-from jax.scipy.stats import beta as jbeta
-from jax.scipy.stats import geom as jgeom

@@ -23,7 +23,7 @@ class BaseDataset(ABC):
     @abstractmethod
     def load(self):
         """
-        Abstract method for loading data from somewhere. 
+        Abstract method for loading data from somewhere.
         """
         pass
 

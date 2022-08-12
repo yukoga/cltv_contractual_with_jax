@@ -22,16 +22,16 @@ from jax.scipy.stats import beta
 
 
 class Beta(BaseContinuousDist):
-    def __init__(self,
-                 a:jnp.DeviceArray =1.,
-                 b:jnp.DeviceArray =1.) -> BaseContinuousDist:
+    def __init__(
+        self, a: jnp.DeviceArray = 1.0, b: jnp.DeviceArray = 1.0
+    ) -> BaseContinuousDist:
         self.a = a
         self.b = b
 
     def logpdf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
-        """ Calc log-pdf of beta distribution for given data.
+        """Calc log-pdf of beta distribution for given data.
         and probability distribution in log pdf form.
-        
+
         Parameters
         ----------
         x: array_like
@@ -43,11 +43,9 @@ class Beta(BaseContinuousDist):
         """
         return beta.logpdf(x, a=self.a, b=self.b)
 
-    def sample(self,
-               rng_key: jnp.DeviceArray,
-               size: int) -> jnp.DeviceArray:
-        """ Generate random values from a beta distribution. 
-        
+    def sample(self, rng_key: jnp.DeviceArray, size: int) -> jnp.DeviceArray:
+        """Generate random values from a beta distribution.
+
         Parameters
         ----------
         rng_key: int or array_like
@@ -65,25 +63,25 @@ class Beta(BaseContinuousDist):
         return random.beta(rng_key, self.a, self.b, (size,))
 
 
-def loglikelihood(x: jnp.DeviceArray,
-                  a: jnp.DeviceArray,
-                  b: jnp.DeviceArray) -> tuple:
-    """ Calc log-likelihood of the beta distribution for given data.
-    
+def loglikelihood(
+    x: jnp.DeviceArray, a: jnp.DeviceArray, b: jnp.DeviceArray
+) -> tuple:
+    """Calc log-likelihood of the beta distribution for given data.
+
     Parameters
     ----------
     x: array_like
         observed data in the form of 1-D vector.
     a: array_like
-        The first shape parameter in the form of (D, N) array where N is sample size
-        and D is dimension size.
+        The first shape parameter in the form of (D, N) array
+        where N is sample size and D is dimension size.
     b: array_like
         2nd shape parameter in the form of (N,) array where N is sample size.
 
     Returns
     -------
     (loglikelihood, Beta): tuple
-        log-likelihood for given data x: jnp.DeviceArray with shape parameters 
+        log-likelihood for given data x: jnp.DeviceArray with shape parameters
         and
         the instance of Beta distribution for given parameters.
     """
@@ -91,43 +89,45 @@ def loglikelihood(x: jnp.DeviceArray,
     return d.loglikelihood(x), d
 
 
-def neg_loglikelihood(x: jnp.DeviceArray,
-                      a: jnp.DeviceArray,
-                      b: jnp.DeviceArray) -> tuple:
-    """ Calc negative log-likelihood of the beta distribution for given data.
-    
+def neg_loglikelihood(
+    x: jnp.DeviceArray, a: jnp.DeviceArray, b: jnp.DeviceArray
+) -> tuple:
+    """Calc negative log-likelihood of the beta distribution for given data.
+
     Parameters
     ----------
     x: array_like
         observed data in the form of 1-D vector.
     a: array_like
-        The first shape parameter in the form of (D, N) array where N is sample size
-        and D is dimension size.
+        The first shape parameter in the form of (D, N) array
+        where N is sample size and D is dimension size.
     b: array_like
         2nd shape parameter in the form of (N,) array where N is sample size.
 
     Returns
     -------
     (neg_loglikelihood, Beta): tuple
-        negative log-likelihood for given data x: jnp.DeviceArray with shape parameters 
-        and
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with shape parameters and
         the instance of Beta distribution for given parameters.
     """
     d = Beta(a, b)
     return d.negloglikelihood(x), d
 
 
-def rv_samples(a: jnp.DeviceArray = 1.,
-               b: jnp.DeviceArray = 1.,
-               rng_key: jnp.DeviceArray = 1,
-               size=100) -> tuple:
-    """ Generate random values from a beta distribution. 
-    
+def rv_samples(
+    a: jnp.DeviceArray = 1.0,
+    b: jnp.DeviceArray = 1.0,
+    rng_key: jnp.DeviceArray = 1,
+    size=100,
+) -> tuple:
+    """Generate random values from a beta distribution.
+
     Parameters
     ----------
     a: array_like
-        The first shape parameter in the form of (D, N) array where N is sample size
-        and D is dimension size.
+        The first shape parameter in the form of (D, N) array
+        where N is sample size and D is dimension size.
     b: array_like
         2nd shape parameter in the form of (N,) array where N is sample size.
     rng_key: int or array_like
@@ -138,8 +138,8 @@ def rv_samples(a: jnp.DeviceArray = 1.,
     Returns
     -------
     (samples, Beta): tuple
-        random values sampleing from Beta distribution specified by given parameters
-        and
+        random values sampleing from Beta distribution specified
+        by given parameters and
         the instance of Beta distribution for given parameters.
     """
     d = Beta(a, b)

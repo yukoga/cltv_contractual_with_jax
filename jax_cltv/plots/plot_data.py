@@ -21,55 +21,61 @@ import matplotlib.pyplot as plt
 from jax_cltv.dists.geom import Geometric
 
 
-def plot_chart(ax: any,
-               data: any=None, 
-               x: any=None,
-               y: any=None,
-               kind: str='line',
-               color: str=None,
-            #    style: str='ggplot',
-            #    figsize: tuple=(16, 9),
-               alpha: float=.4,
-            #    fontsize: int=14,
-               label: str=None,
-               **kwargs):
-    type_x, type_y, type_data = type(x), type(y), type(data)
-    if type_x == type_y == type_data == type(None):
-        raise TypeError('Please specify either data or (x and y) parameters.')
-    elif type_x == str and type_y == str and type(data) == pd.DataFrame:
+def plot_chart(
+    ax: any,
+    data: any = None,
+    x: any = None,
+    y: any = None,
+    kind: str = "line",
+    color: str = None,
+    alpha: float = 0.4,
+    label: str = None,
+    **kwargs
+):
+    if (x is None) and (y is None) and (data is None):
+        raise TypeError("Please specify either data or (x and y) parameters.")
+    elif type(x) == str and type(y) == str and type(data) == pd.DataFrame:
         x, y = data[x], data[y]
     else:
         pass
 
-    if kind == 'plot':
+    if kind == "plot":
         ax.plot(x, y, alpha=alpha, label=label, c=color)
-    elif kind =='scatter':
+    elif kind == "scatter":
         ax.scatter(x, y, alpha=alpha, label=label, c=color)
-    elif kind == 'hist':
-        ax.hist(y, alpha=alpha, label=label, color=color,
-                bins=kwargs['bins'], density=kwargs['density'])
-    elif kind == 'bar':
+    elif kind == "hist":
+        ax.hist(
+            y,
+            alpha=alpha,
+            label=label,
+            color=color,
+            bins=kwargs["bins"],
+            density=kwargs["density"],
+        )
+    elif kind == "bar":
         ax.bar(x, y, alpha=alpha, label=label, color=color)
     else:
         ax.plot(x, y, alpha=alpha, label=label, c=color)
-    
+
     return ax
 
 
-def plot_churns(data: any,
-                theta: any=None,
-                bins: int=10,
-                density: bool=False,
-                style: str='ggplot',
-                figsize: tuple=(16, 9),
-                alpha: float=.4,
-                fontsize: int=14,
-                title: str='Plot of churned users') -> plt.Axes:
+def plot_churns(
+    data: any,
+    theta: any = None,
+    bins: int = 10,
+    density: bool = False,
+    style: str = "ggplot",
+    figsize: tuple = (16, 9),
+    alpha: float = 0.4,
+    fontsize: int = 14,
+    title: str = "Plot of churned users",
+) -> plt.Axes:
     """
     Plot churned users tabular data which is in the form as follows:
-        - The shape is (# of users, # of days users survies).  
-        - If an specific user (=i.e. record) churns at a specific day (=i.e. column),
-          then the cell must be 1, otherwise 0.
+        - The shape is (# of users, # of days users survies).
+        - If an specific user (=i.e. record) churns at a specific day
+        (=i.e. column), then the cell must be 1, otherwise 0.
 
     Parameters
     ----------
@@ -108,14 +114,21 @@ def plot_churns(data: any,
     N, D = data.shape
 
     x = np.linspace(1, D, D)
-    data = data.sum(axis=1).astype('int32')
+    data = data.sum(axis=1).astype("int32")
 
     ax.set_title(title, fontsize=fontsize)
-    ax.set_xlabel('Durations')
-    ax.set_ylabel('# of churned users.')
+    ax.set_xlabel("Durations")
+    ax.set_ylabel("# of churned users.")
     ax.set_xticks(x)
-    ax = plot_chart(ax, y=data, kind='hist', alpha=alpha,
-                    density=density, bins=bins, label='Observed churns')
+    ax = plot_chart(
+        ax,
+        y=data,
+        kind="hist",
+        alpha=alpha,
+        density=density,
+        bins=bins,
+        label="Observed churns",
+    )
     # ax.hist(data, bins=bins, alpha=alpha, density=density)
     if theta:
         gd = Geometric(theta)
@@ -123,27 +136,36 @@ def plot_churns(data: any,
         if not density:
             pmf = pmf * N
         # ax.scatter(x, pmf, c='k')
-        ax = plot_chart(ax, x=x, y=pmf, kind='scatter', alpha=.9,
-                        color='k', label='probabilty distributions (pmf)')
-    
+        ax = plot_chart(
+            ax,
+            x=x,
+            y=pmf,
+            kind="scatter",
+            alpha=0.9,
+            color="k",
+            label="probabilty distributions (pmf)",
+        )
+
     plt.legend()
     return ax
 
 
-def plot_survives(data: any,
-                  theta: any=None,
-                  bins: int=10,
-                  density: bool=False,
-                  style: str='ggplot',
-                  figsize: tuple=(16, 9),
-                  alpha: float=.4,
-                  fontsize: int=14,
-                  title: str='Plot of survived users') -> plt.Axes:
+def plot_survives(
+    data: any,
+    theta: any = None,
+    bins: int = 10,
+    density: bool = False,
+    style: str = "ggplot",
+    figsize: tuple = (16, 9),
+    alpha: float = 0.4,
+    fontsize: int = 14,
+    title: str = "Plot of survived users",
+) -> plt.Axes:
     """
     Plot survived users tabular data which is in the form as follows:
-        - The shape is (# of users, # of days users survies).  
-        - If an specific user (=i.e. record) churns at a specific day (=i.e. column),
-          then the cell must be 1, otherwise 0.
+        - The shape is (# of users, # of days users survies).
+        - If an specific user (=i.e. record) churns at a specific day
+        (=i.e. column), then the cell must be 1, otherwise 0.
 
     Parameters
     ----------
@@ -176,11 +198,12 @@ def plot_survives(data: any,
         and
         the instance of Geometric distribution for given parameters.
     """
+
     def subtract_pmf(prev, k):
         if k == 0:
-            return prev - pmf.loc[k, 'pmf']
+            return prev - pmf.loc[k, "pmf"]
         else:
-            return subtract_pmf(prev - pmf.loc[k, 'pmf'], k - 1)
+            return subtract_pmf(prev - pmf.loc[k, "pmf"], k - 1)
 
     plt.style.use(style)
     fig = plt.figure(figsize=figsize)
@@ -188,33 +211,49 @@ def plot_survives(data: any,
     N, D = data.shape
 
     x = np.linspace(1, D, D)
-    data = data.sum(axis=0).astype('int32')
+    data = data.sum(axis=0).astype("int32")
     x_plot = np.insert(x[:-1], 0, 0)
     if density:
         data = data / N
 
     ax.set_title(title, fontsize=fontsize)
-    ax.set_xlabel('Durations')
-    ax.set_ylabel('# of survived users.')
+    ax.set_xlabel("Durations")
+    ax.set_ylabel("# of survived users.")
     # ax.bar(x, data, alpha=alpha)
     ax.set_xticks(x_plot)
-    ax = plot_chart(ax=ax, x=x_plot, y=data, kind='bar',
-                    alpha=alpha, label='Observed survives')
+    ax = plot_chart(
+        ax=ax,
+        x=x_plot,
+        y=data,
+        kind="bar",
+        alpha=alpha,
+        label="Observed survives",
+    )
     if theta:
         gd = Geometric(theta)
         pmf = gd.pmf(x)
-        pmf = pd.DataFrame(pmf, columns=['pmf'])
-        pmf['survived'] = pmf.apply(lambda r: subtract_pmf(1, r.name), axis=1)
-        pmf = pd.concat([pd.DataFrame({'pmf': 0, 'survived': 1}, index=[0]), pmf],
-                        axis=0, ignore_index=True)
+        pmf = pd.DataFrame(pmf, columns=["pmf"])
+        pmf["survived"] = pmf.apply(lambda r: subtract_pmf(1, r.name), axis=1)
+        pmf = pd.concat(
+            [pd.DataFrame({"pmf": 0, "survived": 1}, index=[0]), pmf],
+            axis=0,
+            ignore_index=True,
+        )
         pmf = pmf[:-1]
         if not density:
-            pmf = pmf['survived'] * N
+            pmf = pmf["survived"] * N
         else:
-            pmf = pmf['survived']
+            pmf = pmf["survived"]
         # ax.scatter(x, pmf, c='k')
-        ax = plot_chart(ax, x=x_plot, y=pmf, kind='scatter', alpha=.9,
-                        color='k', label='probabilty distributions (pmf)')
-    
+        ax = plot_chart(
+            ax,
+            x=x_plot,
+            y=pmf,
+            kind="scatter",
+            alpha=0.9,
+            color="k",
+            label="probabilty distributions (pmf)",
+        )
+
     plt.legend()
     return ax

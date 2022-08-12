@@ -19,18 +19,17 @@
 import jax.numpy as jnp
 import jax.random as random
 from jax_cltv.dists.bases import BaseDiscreteDist
-from jax.scipy.stats import geom 
+from jax.scipy.stats import geom
 
 
 class Geometric(BaseDiscreteDist):
-    def __init__(self,
-                 theta:jnp.DeviceArray =.5) -> BaseDiscreteDist:
+    def __init__(self, theta: jnp.DeviceArray = 0.5) -> BaseDiscreteDist:
         self.theta = theta
 
     def logpmf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
-        """ Calc log-pdf of geometric distribution for given data.
+        """Calc log-pdf of geometric distribution for given data.
         and probability distribution in log pdf form.
-        
+
         Parameters
         ----------
         x: array_like
@@ -44,11 +43,9 @@ class Geometric(BaseDiscreteDist):
         """
         return geom.logpmf(x, self.theta)
 
-    def sample(self,
-               rng_key: jnp.DeviceArray,
-               size: int) -> jnp.DeviceArray:
-        """ Generate random values from a geometric distribution. 
-        
+    def sample(self, rng_key: jnp.DeviceArray, size: int) -> jnp.DeviceArray:
+        """Generate random values from a geometric distribution.
+
         Parameters
         ----------
         rng_key: int or array_like
@@ -64,14 +61,14 @@ class Geometric(BaseDiscreteDist):
             rng_key = random.PRNGKey(rng_key)
 
         return jnp.ceil(
-            jnp.log(random.uniform(rng_key, (size, ))) / jnp.log1p(- self.theta))
+            jnp.log(random.uniform(rng_key, (size,))) / jnp.log1p(-self.theta)
+        )
         # return random.geometric(rng_key, self.a, self.b, (size,))
 
 
-def loglikelihood(x: jnp.DeviceArray,
-                  theta: jnp.DeviceArray) -> tuple:
-    """ Calc log-likelihood of the geometric distribution for given data.
-    
+def loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
+    """Calc log-likelihood of the geometric distribution for given data.
+
     Parameters
     ----------
     x: array_like
@@ -90,10 +87,9 @@ def loglikelihood(x: jnp.DeviceArray,
     return d.loglikelihood(x), d
 
 
-def neg_loglikelihood(x: jnp.DeviceArray,
-                      theta: jnp.DeviceArray) -> tuple:
-    """ Calc negative log-likelihood of the geometric distribution for given data.
-    
+def neg_loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
+    """Calc negative log-likelihood of the geometric distribution for given data.
+
     Parameters
     ----------
     x: array_like
@@ -112,11 +108,11 @@ def neg_loglikelihood(x: jnp.DeviceArray,
     return d.negloglikelihood(x), d
 
 
-def rv_samples(theta: jnp.DeviceArray = .5,
-               rng_key: jnp.DeviceArray = 1,
-               size=100) -> tuple:
-    """ Generate random values from a geometric distribution. 
-    
+def rv_samples(
+    theta: jnp.DeviceArray = 0.5, rng_key: jnp.DeviceArray = 1, size=100
+) -> tuple:
+    """Generate random values from a geometric distribution.
+
     Parameters
     ----------
     theta: array_like

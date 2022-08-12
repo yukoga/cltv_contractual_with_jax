@@ -18,62 +18,73 @@
 
 import jax.numpy as jnp
 from jax_cltv.dists.geom import (
-    Geometric, loglikelihood, neg_loglikelihood, rv_samples) 
+    Geometric,
+    loglikelihood,
+    neg_loglikelihood,
+    rv_samples,
+)
 
 
 def test_instantiate(data):
-    d = Geometric(.5)
-    assert 'Geometric' == d.__class__.__name__, 'It should be an instance of Geometric, '
-    f'but {d.__class__.__name__}.'
+    d = Geometric(0.5)
+    assert (
+        "Geometric" == d.__class__.__name__
+    ), "It should be an instance of Geometric, "
+    f"but {d.__class__.__name__}."
 
 
 def test_geometric_pmf(data):
-    theta = data['geom']['theta']
-    _y = data['geom']['rv']
-    pmf_true = data['geom']['pmf']
+    theta = data["geom"]["theta"]
+    _y = data["geom"]["rv"]
+    pmf_true = data["geom"]["pmf"]
     d = Geometric(theta)
     pmf = d.pmf(_y)
 
-    assert (pmf_true == pmf).all(), 'pmf is wrong. '
-    f'{pmf_true} is expected, but {pmf} is.'
+    assert (pmf_true == pmf).all(), "pmf is wrong. "
+    f"{pmf_true} is expected, but {pmf} is."
 
 
 def test_loglikelihood(data):
-    theta = data['geom']['theta']
-    _y = data['geom']['rv']
-    loglik_true = data['geom']['loglik']
-    loglik, d = loglikelihood(_y, theta) 
+    theta = data["geom"]["theta"]
+    _y = data["geom"]["rv"]
+    loglik_true = data["geom"]["loglik"]
+    loglik, d = loglikelihood(_y, theta)
 
-    assert 'Geometric' == d.__class__.__name__, 'It should be an instance of Normal, '
-    f'but {d.__class__.__name__}.'
-    assert loglik_true == loglik, 'loglik is wrong. '
-    f'{loglik_true} is expected, but {loglik} is.'
+    assert (
+        "Geometric" == d.__class__.__name__
+    ), "It should be an instance of Normal, "
+    f"but {d.__class__.__name__}."
+    assert loglik_true == loglik, "loglik is wrong. "
+    f"{loglik_true} is expected, but {loglik} is."
 
 
 def test_neg_loglikelihood(data):
-    theta = data['geom']['theta']
-    _y = data['geom']['rv']
-    loglik_true = data['geom']['loglik']
-    neg_loglik, _ = neg_loglikelihood(_y, theta) 
-    neg_loglik_true = (-1. * loglik_true) / _y.shape[0]
+    theta = data["geom"]["theta"]
+    _y = data["geom"]["rv"]
+    loglik_true = data["geom"]["loglik"]
+    neg_loglik, _ = neg_loglikelihood(_y, theta)
+    neg_loglik_true = (-1.0 * loglik_true) / _y.shape[0]
 
-    assert neg_loglik == neg_loglik_true, 'neg_loglik is wrong. '
-    f' {neg_loglik_true} is expected, but {neg_loglik} is.'
+    assert neg_loglik == neg_loglik_true, "neg_loglik is wrong. "
+    f" {neg_loglik_true} is expected, but {neg_loglik} is."
 
 
 def test_rv_samples(data):
-    rv_key = data['key']
-    theta = data['geom']['theta']
-    _y = data['geom']['rv']
-    loglik_true = data['geom']['loglik']
+    rv_key = data["key"]
+    theta = data["geom"]["theta"]
+    _y = data["geom"]["rv"]
 
     mu = 1 / theta
     sigma = jnp.sqrt(1 - theta) / theta
 
     samples, _ = rv_samples(theta, rv_key, _y.shape[0])
-    assert round(samples.mean(), 1) == mu, 'Mean of geometric distribution should be '
-    f'close to {mu}, but {round(samples.mean(), 1)}.'
+    assert (
+        round(samples.mean(), 1) == mu
+    ), "Mean of geometric distribution should be "
+    f"close to {mu}, but {round(samples.mean(), 1)}."
 
     # TODO: find any way to reduce samples.var deviation against sample size.
-    assert round(samples.std(), 2) == round(sigma, 2), f'std of geometric distribution should be '
-    f'close to {round(sigma, 2)}, but {round(samples.std(), 2)}.'
+    assert round(samples.std(), 2) == round(
+        sigma, 2
+    ), "std of geometric distribution should be "
+    f"close to {round(sigma, 2)}, but {round(samples.std(), 2)}."
