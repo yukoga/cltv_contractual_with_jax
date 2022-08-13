@@ -17,7 +17,7 @@
 
 import jax.numpy as jnp
 import jax.random as random
-from jax_cltv.dists.bases import BaseContinuousDist
+from jax_cltv.dists.base import BaseContinuousDist
 from jax.scipy.stats import norm
 
 
@@ -107,8 +107,8 @@ def neg_loglikelihood(
     Returns
     -------
     (neg_loglikelihood, Normal): tuple
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value
-        and
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with a scalar value and
         the instance of Normal distribution for given parameters.
     """
     d = Normal(loc, scale)
@@ -138,8 +138,8 @@ def rv_samples(
     Returns
     -------
     (samples, Normal): tuple
-        random values sampleing from Normal distribution specified by given parameters
-        and
+        random values sampleing from Normal distribution specified
+        by given parameters and
         the instance of Normal distribution for given parameters.
     """
     d = Normal(loc, scale)

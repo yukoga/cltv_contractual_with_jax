@@ -53,8 +53,8 @@ class BaseDiscreteDist(ABC):
         return jnp.exp(self.logpmf(x, **kwargs))
 
     def loglikelihood(self, x, **kwargs):
-        """ Calc log-likelihood of the distribution for given data.
-        
+        """Calc log-likelihood of the distribution for given data.
+
         Parameters
         ----------
         x: array_like
@@ -69,8 +69,8 @@ class BaseDiscreteDist(ABC):
         return jnp.sum(self.logpmf(x, **kwargs))
 
     def negloglikelihood(self, x, **kwargs):
-        """ Calc negative log-likelihood of the distribution for given data.
-        
+        """Calc negative log-likelihood of the distribution for given data.
+
         Parameters
         ----------
         x: array_like
@@ -83,7 +83,7 @@ class BaseDiscreteDist(ABC):
         negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
         """
         sample_size = x.shape[0]
-        return (-1. * self.loglikelihood(x, **kwargs)) / sample_size
+        return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size
 
 
 class BaseContinuousDist(ABC):
@@ -119,8 +119,8 @@ class BaseContinuousDist(ABC):
         return jnp.exp(self.logpdf(x, **kwargs))
 
     def loglikelihood(self, x, **kwargs):
-        """ Calc log-likelihood of the distribution for given data.
-        
+        """Calc log-likelihood of the distribution for given data.
+
         Parameters
         ----------
         x: array_like
@@ -135,8 +135,8 @@ class BaseContinuousDist(ABC):
         return jnp.sum(self.logpdf(x, **kwargs))
 
     def negloglikelihood(self, x, **kwargs):
-        """ Calc negative log-likelihood of the distribution for given data.
-        
+        """Calc negative log-likelihood of the distribution for given data.
+
         Parameters
         ----------
         x: array_like
@@ -149,4 +149,4 @@ class BaseContinuousDist(ABC):
         negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
         """
         sample_size = x.shape[0]
-        return (-1. * self.loglikelihood(x, **kwargs)) / sample_size
+        return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size

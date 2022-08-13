@@ -18,7 +18,7 @@
 
 import jax.numpy as jnp
 import jax.random as random
-from jax_cltv.dists.bases import BaseDiscreteDist
+from jax_cltv.dists.base import BaseDiscreteDist
 from jax.scipy.stats import geom
 
 
@@ -88,7 +88,8 @@ def loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
 
 
 def neg_loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
-    """Calc negative log-likelihood of the geometric distribution for given data.
+    """Calc negative log-likelihood of the geometric distribution
+    for given data.
 
     Parameters
     ----------
@@ -100,8 +101,8 @@ def neg_loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
     Returns
     -------
     (neg_loglikelihood, Geometric): tuple
-        Negative sum of Log-probability mass function at data x: jnp.DeviceArray
-        and
+        Negative sum of Log-probability mass function
+        at data x: jnp.DeviceArray and
         the instance of Geometric distribution for given parameters.
     """
     d = Geometric(theta)
@@ -125,8 +126,8 @@ def rv_samples(
     Returns
     -------
     (samples, Geometric): tuple
-        random values sampleing from Geometric distribution specified by given parameters
-        and
+        random values sampleing from Geometric distribution specified
+        by given parameters and
         the instance of Geometric distribution for given parameters.
     """
     d = Geometric(theta)

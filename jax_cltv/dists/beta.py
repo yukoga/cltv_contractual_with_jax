@@ -17,7 +17,7 @@
 
 import jax.numpy as jnp
 import jax.random as random
-from jax_cltv.dists.bases import BaseContinuousDist
+from jax_cltv.dists.base import BaseContinuousDist
 from jax.scipy.stats import beta
 
 
