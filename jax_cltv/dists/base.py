@@ -38,13 +38,6 @@ class BaseDiscreteDist(BaseDist, ABC):
         """
         pass
 
-    # @abstractmethod
-    # def sample(self):
-    #     """
-    #     Abstract method to generate random values following the distribution.
-    #     """
-    #     pass
-
     def pmf(self, x, **kwargs):
         """
         Calculate probability density function.
@@ -103,13 +96,6 @@ class BaseContinuousDist(BaseDist, ABC):
         Abstract method for log-probability density function.
         """
         pass
-
-    # @abstractmethod
-    # def sample(self):
-    #     """
-    #     Abstract method to generate random values following the distribution.
-    #     """
-    #     pass
 
     def pdf(self, x, **kwargs):
         """
