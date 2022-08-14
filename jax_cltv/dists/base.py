@@ -83,7 +83,8 @@ class BaseDiscreteDist(BaseDist, ABC):
 
         Returns
         -------
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with a scalar value.
         """
         sample_size = x.shape[0]
         return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size
@@ -142,7 +143,8 @@ class BaseContinuousDist(BaseDist, ABC):
 
         Returns
         -------
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with a scalar value.
         """
         sample_size = x.shape[0]
         return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size
