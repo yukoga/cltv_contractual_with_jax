@@ -63,7 +63,7 @@ def plot_chart(
 def plot_churns(
     data: any,
     theta: any = None,
-    bins: int = 10,
+    bins: int = None,
     density: bool = False,
     style: str = "ggplot",
     figsize: tuple = (16, 9),
@@ -112,6 +112,7 @@ def plot_churns(
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     N, D = data.shape
+    bins = D if not bins else bins
 
     x = np.linspace(1, D, D)
     data = data.sum(axis=1).astype("int32")
@@ -153,7 +154,7 @@ def plot_churns(
 def plot_survives(
     data: any,
     theta: any = None,
-    bins: int = 10,
+    bins: int = None,
     density: bool = False,
     style: str = "ggplot",
     figsize: tuple = (16, 9),
@@ -209,6 +210,7 @@ def plot_survives(
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
     N, D = data.shape
+    bins = D if not bins else bins
 
     x = np.linspace(1, D, D)
     data = data.sum(axis=0).astype("int32")
