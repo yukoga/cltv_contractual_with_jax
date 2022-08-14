@@ -20,7 +20,13 @@ import jax.numpy as jnp
 from abc import ABC, abstractmethod
 
 
-class BaseDiscreteDist(ABC):
+class BaseDist(ABC):
+    @abstractmethod
+    def sample(self):
+        pass
+
+
+class BaseDiscreteDist(BaseDist, ABC):
     @abstractmethod
     def logpmf(self):
         """
@@ -28,12 +34,12 @@ class BaseDiscreteDist(ABC):
         """
         pass
 
-    @abstractmethod
-    def sample(self):
-        """
-        Abstract method to generate random values following the distribution.
-        """
-        pass
+    # @abstractmethod
+    # def sample(self):
+    #     """
+    #     Abstract method to generate random values following the distribution.
+    #     """
+    #     pass
 
     def pmf(self, x, **kwargs):
         """
@@ -86,7 +92,7 @@ class BaseDiscreteDist(ABC):
         return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size
 
 
-class BaseContinuousDist(ABC):
+class BaseContinuousDist(BaseDist, ABC):
     @abstractmethod
     def logpdf(self):
         """
@@ -94,12 +100,12 @@ class BaseContinuousDist(ABC):
         """
         pass
 
-    @abstractmethod
-    def sample(self):
-        """
-        Abstract method to generate random values following the distribution.
-        """
-        pass
+    # @abstractmethod
+    # def sample(self):
+    #     """
+    #     Abstract method to generate random values following the distribution.
+    #     """
+    #     pass
 
     def pdf(self, x, **kwargs):
         """
