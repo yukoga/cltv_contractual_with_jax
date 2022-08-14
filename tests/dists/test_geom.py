@@ -33,6 +33,20 @@ def test_instantiate(data):
     f"but {d.__class__.__name__}."
 
 
+def test_get_params(data):
+    d = Geometric(0.5)
+    params = d.get_params()
+
+    assert set(params.keys()) == {
+        "theta",
+    }, "The instance of Geometric distribution should have "
+    f"parameters {'theta'}, but {params.keys()}. "
+
+    assert (
+        params["theta"] == 0.5
+    ), f"The parameter theta should be 0.5, but {params['theta']}."
+
+
 def test_geometric_pmf(data):
     theta = data["geom"]["theta"]
     _y = data["geom"]["rv"]

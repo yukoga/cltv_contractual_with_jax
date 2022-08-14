@@ -22,6 +22,10 @@ from abc import ABC, abstractmethod
 
 class BaseDist(ABC):
     @abstractmethod
+    def get_params(self) -> dict:
+        pass
+
+    @abstractmethod
     def sample(self):
         pass
 

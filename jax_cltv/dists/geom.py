@@ -25,6 +25,15 @@ from jax.scipy.stats import geom
 class Geometric(BaseDiscreteDist):
     def __init__(self, theta: jnp.DeviceArray = 0.5) -> BaseDiscreteDist:
         self.theta = theta
+        self.__params = {"theta": theta}
+
+    def get_params(self) -> dict:
+        """Return parameters which characterize the distribution.
+
+        Returns:
+            dict: parameters of Geometric distribution.
+        """
+        return self.__params
 
     def logpmf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
         """Calc log-pdf of geometric distribution for given data.

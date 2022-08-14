@@ -32,6 +32,25 @@ def test_instantiate(data):
     f"but {d.__class__.__name__}."
 
 
+def test_get_params(data):
+    d = Normal(0.5, 1.0)
+    params = d.get_params()
+
+    assert set(params.keys()) == {
+        "loc",
+        "scale",
+    }, "The instance of Normal distribution should have "
+    f"parameters {'loc', 'scale'}, but {params.keys()}. "
+
+    assert (
+        params["loc"] == 0.5
+    ), f"The parameter loc should be 0.5, but {params['loc']}."
+
+    assert (
+        params["scale"] == 1.0
+    ), f"The parameter scale should be 1.0, but {params['scale']}."
+
+
 def test_normal_pdf(data):
     mu = data["normal"]["mu"]
     sigma = data["normal"]["sigma"]
