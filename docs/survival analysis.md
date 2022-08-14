@@ -93,7 +93,7 @@ E[CLTV] &= \displaystyle{\sum_{t=0}^{\infty}} \hspace{2pt}\frac{m}{(1+d)^t}s(t)
 \end{aligned}
 $$
 - $t$ : Discrete time.  
-- $m$ : Subscription rate.  
+- $m$ : Monetize value.  
 - $s(t)$ : survival function at time $t$.
 - $d$ : discount rate reflecting the time value of money.
 
@@ -145,7 +145,7 @@ f(\theta_{u_i}|\alpha_{u_i},\beta_{u_i}) = \frac{\theta_{u_i}^{\alpha_{u_i}-1}(1
 $$ 
 - $\alpha_{u_i}$, $\beta_{u_i}$ : Latent parameters contains customer's characteristics as follows:  
 $$
-\alpha_{u_i}\hspace{2pt} or\hspace{2pt} \beta_{u_i} = {\displaystyle \sum_{k}} w_k^{\alpha \hspace{1pt}or \hspace{1pt}\beta} x_k^{\alpha \hspace{1pt}or \hspace{1pt}\beta} + \epsilon \hspace{10pt}...\hspace{10pt}(6)
+\theta_{u_i} = {\displaystyle \sum_{k}} w_k x_k + \epsilon \hspace{10pt}...\hspace{10pt}(6)
 $$ 
 - $x_k$ : k-th feature for a customer. 
 

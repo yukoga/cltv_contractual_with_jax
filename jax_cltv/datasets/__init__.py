@@ -14,8 +14,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
-
-def test_todo():
-    # TODO: Write a test for model.
-    pass

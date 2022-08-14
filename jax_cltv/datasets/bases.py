@@ -16,6 +16,23 @@
 # ==============================================================================
 
 
-def test_todo():
-    # TODO: Write a test for model.
-    pass
+from abc import ABC, abstractmethod
+
+
+class BaseDataset(ABC):
+    @abstractmethod
+    def load(self):
+        """
+        Abstract method for loading data from somewhere.
+        """
+        pass
+
+    @abstractmethod
+    def to_csv(self):
+        """
+        Abstract method to save data as csv file.
+        """
+        pass
+
+    def __call__(self):
+        return self, self.data
