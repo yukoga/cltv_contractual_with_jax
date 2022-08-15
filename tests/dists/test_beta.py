@@ -31,6 +31,21 @@ def test_instantiate(data):
     f"but {d.__class__.__name__}."
 
 
+def test_get_params(data):
+    d = Beta(0.5, 1.0)
+    params = d.get_params()
+
+    assert set(params.keys()) == {
+        "a",
+        "b",
+    }, "The instance of Beta distribution should have "
+    f"parameters {'a', 'b'}, but {params.keys()}. "
+
+    assert (
+        params["a"] == 0.5
+    ), f"The parameter a should be 0.5, but {params['a']}."
+
+
 def test_beta_pdf(data):
     alpha = data["beta"]["alpha"]
     beta = data["beta"]["beta"]

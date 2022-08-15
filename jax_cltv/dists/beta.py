@@ -27,6 +27,15 @@ class Beta(BaseContinuousDist):
     ) -> BaseContinuousDist:
         self.a = a
         self.b = b
+        self.__params = {"a": a, "b": b}
+
+    def get_params(self) -> dict:
+        """Return parameters which characterize the distribution.
+
+        Returns:
+            dict: parameters of Beta distribution.
+        """
+        return self.__params
 
     def logpdf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
         """Calc log-pdf of beta distribution for given data.

@@ -20,18 +20,21 @@ import jax.numpy as jnp
 from abc import ABC, abstractmethod
 
 
-class BaseDiscreteDist(ABC):
+class BaseDist(ABC):
     @abstractmethod
-    def logpmf(self):
-        """
-        Abstract method for log-probability density function.
-        """
+    def get_params(self) -> dict:
         pass
 
     @abstractmethod
     def sample(self):
+        pass
+
+
+class BaseDiscreteDist(BaseDist, ABC):
+    @abstractmethod
+    def logpmf(self):
         """
-        Abstract method to generate random values following the distribution.
+        Abstract method for log-probability density function.
         """
         pass
 
@@ -80,24 +83,18 @@ class BaseDiscreteDist(ABC):
 
         Returns
         -------
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with a scalar value.
         """
         sample_size = x.shape[0]
         return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size
 
 
-class BaseContinuousDist(ABC):
+class BaseContinuousDist(BaseDist, ABC):
     @abstractmethod
     def logpdf(self):
         """
         Abstract method for log-probability density function.
-        """
-        pass
-
-    @abstractmethod
-    def sample(self):
-        """
-        Abstract method to generate random values following the distribution.
         """
         pass
 
@@ -146,7 +143,8 @@ class BaseContinuousDist(ABC):
 
         Returns
         -------
-        negative log-likelihood for given data x: jnp.DeviceArray with a scalar value.
+        negative log-likelihood for given data x: jnp.DeviceArray
+        with a scalar value.
         """
         sample_size = x.shape[0]
         return (-1.0 * self.loglikelihood(x, **kwargs)) / sample_size

@@ -27,6 +27,15 @@ class Normal(BaseContinuousDist):
     ) -> BaseContinuousDist:
         self.loc = loc
         self.scale = scale
+        self.__params = {"loc": loc, "scale": scale}
+
+    def get_params(self) -> dict:
+        """Return parameters which characterize the distribution.
+
+        Returns:
+            dict: parameters of Normal distribution.
+        """
+        return self.__params
 
     def logpdf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
         """Calc log-pdf of normal distribution for given data.
