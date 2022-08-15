@@ -160,7 +160,4 @@ Temporary Items
 # output
 *.png
 data/
-
-notebooks/jax_sample.ipynb
-notebooks/sandbox.ipynb
-notebooks/archived.ipynb
+notebooks/not_on_repos
