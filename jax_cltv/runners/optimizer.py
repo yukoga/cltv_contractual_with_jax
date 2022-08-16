@@ -15,14 +15,25 @@
 # limitations under the License.
 # ==============================================================================
 
-from typing import Callable
+from typing import Any, Callable
 from abc import ABC
+from jax.scipy.optimize import minimize
+from jaxopt import ScipyBoundedMinimize
 from jax.scipy.optimize import OptimizeResults as jaxOptimizerResults
 from jaxopt._src.base import OptStep as optOptimizerResults
 
 
-class OptimizeResults:
-    def __init__(self, results: any = None) -> dict:
+class OptimizeResults(object):
+    def __init__(self, results: Any):
+        """OptimizerResults contains a result of optimization tasks
+            wrapped jax.scipy.optimize.OptimizeResults
+            or jaxopt._src.base_OptStep object.
+
+        Args:
+            results (Any): Optimization result object. The instance of
+                jax.scipy.optimize.OptimizationResults
+                or jaxopt._src.base.OptStep.
+        """
         self.params = None
         self.status = None
         self.success = None
@@ -30,7 +41,19 @@ class OptimizeResults:
         self.niter = None
         self.parse_results(results)
 
-    def parse_results(self, results) -> None:
+    def parse_results(self, results: Any) -> None:
+        """Get and fit optimization results properties into fields.
+
+        Args:
+            results (Any): Optimization result object. The instance of
+                jax.scipy.optimize.OptimizationResults
+                or jaxopt._src.base.OptStep.
+
+        Raises:
+            TypeError: Raises when the results are not the instance of
+                jax.scipy.optimize.OptimizationResults or
+                jaxopt._src.base.OptStep.
+        """
         if isinstance(results, jaxOptimizerResults):
             self.parse_jax_results(results)
         elif isinstance(results, optOptimizerResults):
@@ -42,7 +65,13 @@ class OptimizeResults:
                 f"or jaxopt._src.base.Optstep, but {type(results)}."
             )
 
-    def parse_jax_results(self, results):
+    def parse_jax_results(self, results: jaxOptimizerResults):
+        """Fit jax optimization results properties into fields.
+
+        Args:
+            results (jaxOptimizerResults): Optimization result object.
+                The instance of jax.scipy.optimize.OptimizationResults.
+        """
         self.params = results.x
         self.status = results.status
         self.success = results.success
@@ -50,6 +79,12 @@ class OptimizeResults:
         self.niter = results.nit
 
     def parse_jaxopt_results(self, results):
+        """Fit jaxopt optimization results properties into fields.
+
+        Args:
+            results (optOptimizerResults): Optimization result object.
+                The instance of jaxopt._src.base.OptStep.
+        """
         self.params = results.params
         self.status = results.state.status
         self.success = results.state.success
@@ -58,26 +93,25 @@ class OptimizeResults:
 
 
 class BaseOptimizer(ABC):
-    def __init__(
-        self,
-        loss: Callable = None,
-        optimizer: any = None,
-    ) -> None:
-        self._optimizer = optimizer
-        self._loss = loss
+    def __init__(self, options: dict = None):
+        self._optimizer = None
+        self.options = options
 
-    def __call__(self, params: iter, data: tuple, options: dict = None):
+    def __call__(
+        self, func: Callable, params: iter, data: tuple
+    ) -> OptimizeResults:
         """Make it callable the Optimizer object. Call self.run inside.
 
         Args:
-            params (iter): _description_
-            data (tuple): _description_
-            options (dict, optional): _description_. Defaults to None.
+            func (Callable): Loss function to be optimized.
+            params (iter): The list of parameters
+                which characterize loss function.
+            data (tuple): The data that the optimizer learns from.
 
         Returns:
-            _type_: _description_
+            OptimizeResults: Returns optimize results.
         """
-        return self.run(params, data, options)
+        return self.run(func, params, data, self.options)
 
     @property
     def runner(self) -> any:
@@ -89,32 +123,50 @@ class BaseOptimizer(ABC):
         return self._optimizer
 
     @runner.setter
-    def set_runner(self, runner: any) -> None:
+    def runner(self, runner: any) -> None:
         """Setter for runner = optimizer.
 
         Args:
             runner (any): JAX or JAXopt optimizer.
         """
-        self.__optimizer = runner
+        self._optimizer = runner
 
-    def run(self, params: iter, data: tuple, options: dict = None) -> any:
+    def run(
+        self, func: Callable, params: iter, data: tuple, options: dict = {}
+    ) -> OptimizeResults:
         """Execute optimization for given params based on data
             and optimize options.
 
         Args:
-            params (iter): The list of parameters to be optimzied.
+            func (Callable): Loss function to be optimized.
+            params (iter): The list of parameters
+                which characterize loss function.
             data (tuple): The data that the optimizer learns from.
             options (dict, optional): Optional parameters for optimizations.
 
         Returns:
-            Any: Returns optimize results
+            OptimizeResults: Returns optimize results.
         """
-        return self.runner(params, data, options)
+        return self.runner(func, params, data, options)
 
 
 class DefaultOptimizer(BaseOptimizer):
-    pass
+    def __init__(self, options: dict = {"gtol": 1e-4}):
+        super().__init__(options=options)
+        self.runner = lambda l, p, d, o: minimize(
+            l, p, args=d, method="BFGS", options=dict(options, **o)
+        )
 
 
 class JaxOptOptimizer(BaseOptimizer):
-    pass
+    def __init__(self, options: dict = {"gtol": 1e-4}):
+        super().__init__(options=options)
+
+        def minimizer(loss, param, data, opt):
+            m = ScipyBoundedMinimize(
+                fun=loss, method="l-bfgs-b", options=dict(options, **opt)
+            )
+            lb, ub = 0.00001, 0.99999
+            return m.run(param, bounds=(lb, ub), data=data)
+
+        self.runner = minimizer
