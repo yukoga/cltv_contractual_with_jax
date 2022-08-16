@@ -25,18 +25,6 @@ from jax_cltv.runners.optimizer import (
 )
 
 
-def test_instantiate(data):
-    dopt = DefaultOptimizer()
-    jopt = JaxOptOptimizer()
-
-    assert (
-        dopt.__class__.__name__ == "DefaultOptimizer"
-    ), "Failed to instantiate DefaultOptimizer."
-    assert (
-        jopt.__class__.__name__ == "JaxOptOptimizer"
-    ), "Failed to instantiate DefaultOptimizer."
-
-
 def test_default_optimizer_resuts(data):
     _mu = data["normal"]["mu"]
     _sigma = data["normal"]["sigma"]

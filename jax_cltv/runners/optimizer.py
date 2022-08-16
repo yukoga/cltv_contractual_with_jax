@@ -65,7 +65,7 @@ class OptimizeResults(object):
                 f"or jaxopt._src.base.Optstep, but {type(results)}."
             )
 
-    def parse_jax_results(self, results: jaxOptimizerResults):
+    def parse_jax_results(self, results: jaxOptimizerResults) -> None:
         """Fit jax optimization results properties into fields.
 
         Args:
@@ -78,7 +78,7 @@ class OptimizeResults(object):
         self.func_val = results.fun
         self.niter = results.nit
 
-    def parse_jaxopt_results(self, results):
+    def parse_jaxopt_results(self, results) -> None:
         """Fit jaxopt optimization results properties into fields.
 
         Args:
