@@ -18,11 +18,7 @@
 import jax.numpy as jnp
 from jax_cltv.dists.normal import neg_loglikelihood
 from jax_cltv.dists.geom import neg_loglikelihood as geom_neg_loglikelihood
-from jax_cltv.runners.optimizer import (
-    DefaultOptimizer,
-    JaxOptOptimizer,
-    OptimizeResults,
-)
+from jax_cltv.runners.optimizer import DefaultOptimizer, JaxOptOptimizer
 
 
 def test_default_optimizer_resuts(data):
@@ -35,10 +31,9 @@ def test_default_optimizer_resuts(data):
         return nl
 
     w_init = jnp.append(jnp.zeros((1,)), 0.5)
-    optimizer = DefaultOptimizer()
-    res = optimizer(loss, w_init, (_x, _y))
+    optimizer = DefaultOptimizer(options={"gtol": 1e-4})
+    ores = optimizer(loss, w_init, (_x, _y))
 
-    ores = OptimizeResults(res)
     mu, sigma = ores.params[0], ores.params[1]
 
     assert (
@@ -74,16 +69,14 @@ def test_jaxopt_optimizer_resuts(data):
     _theta = data["geom"]["theta"]
     _y = data["geom"]["rv"]
 
-    def loss(w, data):
-        y, _ = data
-        nl, _ = geom_neg_loglikelihood(y, w[0])
+    def loss(w, X, y):
+        nl, _ = geom_neg_loglikelihood(X, w[0])
         return nl
 
     w_init = jnp.ones((1,)) * _theta
-    optimizer = JaxOptOptimizer()
-    res = optimizer(loss, w_init, (_y, None))
+    optimizer = JaxOptOptimizer(options={"gtol": 1e-4})
+    ores = optimizer(loss, w_init, (_y, None))
 
-    ores = OptimizeResults(res)
     theta = ores.params[0]
 
     assert isinstance(

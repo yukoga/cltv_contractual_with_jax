@@ -16,15 +16,19 @@
 # ==============================================================================
 
 
+from typing import Callable
 from abc import ABC, abstractmethod
 
 
 class BaseModel(ABC):
     @abstractmethod
-    def fit(self, X: any = None, y: any = None) -> None:
+    def fit(self, loss: Callable = None, X: any = None, y: any = None) -> None:
         """Abstract method for training from data.
 
         Args:
+            loss (function, required): Loss function to be minimized.
+                The loss function should take the first argument as
+                list of parameters, and other keyword arguments.
             X (any, required): Given feature dataset to train the model.
                 Defaults to None.
             y (any, required): Given target variables to train the model.

@@ -114,7 +114,7 @@ class BaseOptimizer(ABC):
         return self.run(func, params, data, self.options)
 
     @property
-    def runner(self) -> any:
+    def runner(self) -> Any:
         """Runner property which returns JAX or JAXopt optimizer.
 
         Returns:
@@ -123,11 +123,11 @@ class BaseOptimizer(ABC):
         return self._optimizer
 
     @runner.setter
-    def runner(self, runner: any) -> None:
+    def runner(self, runner: Any) -> None:
         """Setter for runner = optimizer.
 
         Args:
-            runner (any): JAX or JAXopt optimizer.
+            runner (Any): JAX or JAXopt optimizer.
         """
         self._optimizer = runner
 
@@ -147,26 +147,29 @@ class BaseOptimizer(ABC):
         Returns:
             OptimizeResults: Returns optimize results.
         """
-        return self.runner(func, params, data, options)
+        res = self.runner(func, params, data, options)
+        return OptimizeResults(res)
 
 
 class DefaultOptimizer(BaseOptimizer):
-    def __init__(self, options: dict = {"gtol": 1e-4}):
+    def __init__(self, options: dict = {}):
         super().__init__(options=options)
         self.runner = lambda l, p, d, o: minimize(
-            l, p, args=d, method="BFGS", options=dict(options, **o)
+            l, p, d, method="BFGS", options=dict(options, **o)
         )
 
 
 class JaxOptOptimizer(BaseOptimizer):
-    def __init__(self, options: dict = {"gtol": 1e-4}):
+    def __init__(self, options: dict = {}):
         super().__init__(options=options)
 
         def minimizer(loss, param, data, opt):
             m = ScipyBoundedMinimize(
-                fun=loss, method="l-bfgs-b", options=dict(options, **opt)
+                fun=loss,
+                method="l-bfgs-b",
+                options=dict(options, **opt),
             )
             lb, ub = 0.00001, 0.99999
-            return m.run(param, bounds=(lb, ub), data=data)
+            return m.run(param, (lb, ub), *data)
 
         self.runner = minimizer

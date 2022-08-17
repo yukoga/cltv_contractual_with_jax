@@ -16,10 +16,8 @@
 # ==============================================================================
 
 
-from inspect import _void
 from typing import Iterable
 import pandas as pd
-import numpy as np
 import jax.numpy as jnp
 import jax.random as random
 from jax_cltv.datasets.bases import BaseDataset
@@ -27,8 +25,8 @@ from jax_cltv.dists.geom import rv_samples
 
 
 class DummySubscriptions(BaseDataset):
-    def __init__(self, rng_key=1, p=0.5, size=100):
-        self.data = self.get_samples(rng_key, p, size)
+    def __init__(self, rng_key=1, p=0.5, size=100, noise=None):
+        self.data = self.get_samples(rng_key, p, size, noise)
 
     def to_pandas(self, columns: Iterable = None) -> pd.DataFrame:
         df = pd.DataFrame(self.data, columns=columns)
@@ -37,12 +35,26 @@ class DummySubscriptions(BaseDataset):
         return df
 
     def get_samples(
-        self, rng_key: jnp.DeviceArray, p: jnp.DeviceArray, size: int
+        self,
+        rng_key: jnp.DeviceArray,
+        p: jnp.DeviceArray,
+        size: int,
+        noise: dict = None,
     ) -> jnp.DeviceArray:
         # arrays each elements indicates the day users churn.
         if not isinstance(rng_key, jnp.DeviceArray):
             rng_key = random.PRNGKey(rng_key)
         rtns, _ = rv_samples(p, rng_key, size=size)
+        if noise and len(set(noise.keys()).intersection(set(["lam"]))) == 1:
+            rtns += random.poisson(rng_key, noise["lam"], (size,))
+            # rtns += (
+            #     round(
+            #         noise["mu"]
+            #         + noise["sigma"] * random.normal(rng_key, (size,))
+            #     )
+            #     .to_py()
+            #     .astype("int")
+            # )
         drtns = (rtns.max() + 1).to_py().astype("int")
         # D = int(drtns)
         for i, r in enumerate(rtns):
