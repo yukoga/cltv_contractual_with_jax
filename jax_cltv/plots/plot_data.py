@@ -15,6 +15,7 @@
 # limitations under the License.
 # ==============================================================================
 
+from typing import Any
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,6 +27,7 @@ def plot_chart(
     data: any = None,
     x: any = None,
     y: any = None,
+    yscale: str = None,
     kind: str = "line",
     color: str = None,
     alpha: float = 0.4,
@@ -38,6 +40,9 @@ def plot_chart(
         x, y = data[x], data[y]
     else:
         pass
+
+    D = x.shape[0]
+    N = y.shape[0]
 
     if kind == "plot":
         ax.plot(x, y, alpha=alpha, label=label, c=color)
@@ -53,23 +58,31 @@ def plot_chart(
             density=kwargs["density"],
         )
     elif kind == "bar":
+        if N != D:
+            y = y.value_counts()
         ax.bar(x, y, alpha=alpha, label=label, color=color)
     else:
         ax.plot(x, y, alpha=alpha, label=label, c=color)
+
+    if yscale in ("linear", "log", "symlog", "log"):
+        ax.set_yscale(yscale)
 
     return ax
 
 
 def plot_churns(
-    data: any,
-    theta: any = None,
+    data: Any,
+    theta: Any = None,
     bins: int = None,
+    yscale: str = "linear",
     density: bool = False,
+    kind: str = "plot",
     style: str = "ggplot",
     figsize: tuple = (16, 9),
     alpha: float = 0.4,
     fontsize: int = 14,
     title: str = "Plot of churned users",
+    ax: Any = None,
 ) -> plt.Axes:
     """
     Plot churned users tabular data which is in the form as follows:
@@ -109,13 +122,25 @@ def plot_churns(
         the instance of Geometric distribution for given parameters.
     """
     plt.style.use(style)
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_subplot(111)
+    if not ax:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111)
     N, D = data.shape
     bins = D if not bins else bins
 
     x = np.linspace(1, D, D)
-    data = data.sum(axis=1).astype("int32")
+    y = data.sum(axis=1).astype("int32")
+
+    if kind == "bar":
+        _df = pd.DataFrame({"day": x}).astype("int32")
+        data = pd.concat([_df, y.value_counts()], axis=1)
+        data.columns = ["day", "churns"]
+        data.loc[0, "churns"] = N
+        data.fillna(0, inplace=True)
+        x, y = data["day"].values, data["churns"].values
+        if density:
+            y = y / N
+        del _df
 
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel("Durations")
@@ -123,8 +148,11 @@ def plot_churns(
     ax.set_xticks(x)
     ax = plot_chart(
         ax,
-        y=data,
-        kind="hist",
+        x=x,
+        y=y,
+        yscale=yscale,
+        # kind="hist",
+        kind=kind,
         alpha=alpha,
         density=density,
         bins=bins,
@@ -141,6 +169,7 @@ def plot_churns(
             ax,
             x=x,
             y=pmf,
+            yscale=yscale,
             kind="scatter",
             alpha=0.9,
             color="k",
@@ -152,15 +181,17 @@ def plot_churns(
 
 
 def plot_survives(
-    data: any,
-    theta: any = None,
+    data: Any,
+    theta: Any = None,
     bins: int = None,
+    yscale: str = "linear",
     density: bool = False,
     style: str = "ggplot",
     figsize: tuple = (16, 9),
     alpha: float = 0.4,
     fontsize: int = 14,
     title: str = "Plot of survived users",
+    ax: Any = None,
 ) -> plt.Axes:
     """
     Plot survived users tabular data which is in the form as follows:
@@ -207,8 +238,10 @@ def plot_survives(
             return subtract_pmf(prev - pmf.loc[k, "pmf"], k - 1)
 
     plt.style.use(style)
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_subplot(111)
+    if not ax:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111)
+
     N, D = data.shape
     bins = D if not bins else bins
 
@@ -227,6 +260,7 @@ def plot_survives(
         ax=ax,
         x=x_plot,
         y=data,
+        yscale=yscale,
         kind="bar",
         alpha=alpha,
         label="Observed survives",
@@ -251,6 +285,7 @@ def plot_survives(
             ax,
             x=x_plot,
             y=pmf,
+            yscale=yscale,
             kind="scatter",
             alpha=0.9,
             color="k",
