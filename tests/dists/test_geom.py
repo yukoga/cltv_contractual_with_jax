@@ -35,7 +35,7 @@ def test_instantiate(data):
 
 def test_get_params(data):
     d = Geometric(0.5)
-    params = d.get_params()
+    params = d.params
 
     assert set(params.keys()) == {
         "theta",
@@ -45,6 +45,21 @@ def test_get_params(data):
     assert (
         params["theta"] == 0.5
     ), f"The parameter theta should be 0.5, but {params['theta']}."
+
+
+def test_set_params(data):
+    d = Geometric(0.5)
+    d.params = {"theta": 1.0}
+    params = d.params
+
+    assert set(params.keys()) == {
+        "theta",
+    }, "The instance of Geometric distribution should have "
+    f"parameters {'theta'}, but {params.keys()}. "
+
+    assert (
+        params["theta"] == 1.0
+    ), f"The parameter theta should be 1.0, but {params['theta']}."
 
 
 def test_geometric_pmf(data):

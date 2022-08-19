@@ -132,4 +132,17 @@ def test_validate(data):
 
 
 def test_predict(data):
+    _theta = data["geom"]["theta"]
+    _x = data["geom"]["rv"]
+
+    def model():
+        return MLE(dist=Geometric(theta=0.01))
+
+    def loss(w, X, y):
+        nl, _ = geom_neg_loglikelihood(X, w[0])
+        return nl
+
+    m = model()
+    w_init = jnp.array(list(m.params.values()))
+    res = m.fit(loss, w_init, (_x, None))
     pass

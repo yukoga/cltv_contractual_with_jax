@@ -33,7 +33,7 @@ def test_instantiate(data):
 
 def test_get_params(data):
     d = Beta(0.5, 1.0)
-    params = d.get_params()
+    params = d.params
 
     assert set(params.keys()) == {
         "a",
@@ -44,6 +44,28 @@ def test_get_params(data):
     assert (
         params["a"] == 0.5
     ), f"The parameter a should be 0.5, but {params['a']}."
+    assert (
+        params["b"] == 1.0
+    ), f"The parameter b should be 1.0, but {params['b']}."
+
+
+def test_set_params(data):
+    d = Beta(0.5, 1.0)
+    d.params = {"a": 2.0, "b": 3.0}
+    params = d.params
+
+    assert set(params.keys()) == {
+        "a",
+        "b",
+    }, "The instance of Beta distribution should have "
+    f"parameters {'a', 'b'}, but {params.keys()}. "
+
+    assert (
+        params["a"] == 2.0
+    ), f"The parameter a should be 2.0, but {params['a']}."
+    assert (
+        params["b"] == 3.0
+    ), f"The parameter b should be 3.0, but {params['b']}."
 
 
 def test_beta_pdf(data):
