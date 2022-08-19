@@ -15,8 +15,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
-import jax.numpy as jnp
 from jax_cltv.dists.beta import (
     Beta,
     loglikelihood,
@@ -113,15 +111,15 @@ def test_rv_samples(data):
     _y = data["beta"]["rv"]
 
     mu = alpha / (alpha + beta)
-    _ = jnp.sqrt(alpha * beta / ((alpha + beta) ** 2 * (alpha + beta + 1)))
+    var = alpha * beta / ((alpha + beta) ** 2 * (alpha + beta + 1))
 
     samples, _ = rv_samples(alpha, beta, rv_key, _y.shape[0])
     assert (
-        round(samples.mean(), 2) == mu
+        round((samples.mean() - mu) / mu, 2) < 0.1
     ), "Mean of beta distribution should be "
     f"close to {mu}, but {round(samples.mean(), 2)}."
 
-    # TODO: find any way to reduce samples.var deviation against sample size.
-    # assert round(samples.std(), 2) == round(sigma, 2),
-    # f'Variance of beta distribution should be '
-    # f'close to {round(sigma, 2)}, but {round(samples.std(), 2)}.'
+    assert (
+        round((samples.var() - var) / var, 2) < 0.1
+    ), "Variance of beta distribution should be "
+    f"close to {round(var, 2)}, but {round(samples.var(), 2)}."

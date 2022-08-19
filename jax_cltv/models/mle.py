@@ -15,7 +15,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
 from typing import Callable, Any
 from jax_cltv.dists import is_continuous_dist
 from jax_cltv.dists.base import BaseDist
@@ -59,6 +58,10 @@ class MLE(BaseModel):
                 JaxOptOptimizer(options), loss, init_params, data
             )
 
+        self.params = {
+            k: res.params[i] for i, (k, v) in enumerate(self.params.items())
+        }
+        self.dist = self.dist.__class__(**self.params)
         return res
 
     def validate(self, X: any = None, y: any = None) -> None:
@@ -70,7 +73,7 @@ class MLE(BaseModel):
             def func(X):
                 return 1
 
-        if is_continuous_dist:
+        if is_continuous_dist(self.dist):
             expt = (func(X) * self.dist.pdf(X)).sum()
         else:
             expt = (func(X) * self.dist.pmf(X)).sum()
