@@ -27,13 +27,18 @@ class Geometric(BaseDiscreteDist):
         self.theta = theta
         self.__params = {"theta": theta}
 
-    def get_params(self) -> dict:
+    @property
+    def params(self) -> dict:
         """Return parameters which characterize the distribution.
 
         Returns:
             dict: parameters of Geometric distribution.
         """
         return self.__params
+
+    @params.setter
+    def params(self, params):
+        self.__params = params
 
     def logpmf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
         """Calc log-pdf of geometric distribution for given data.

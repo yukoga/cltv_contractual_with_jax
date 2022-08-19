@@ -14,3 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
+from jax_cltv.dists.base import BaseContinuousDist, BaseDiscreteDist
+
+
+def is_continuous_dist(d):
+    if isinstance(d, BaseContinuousDist):
+        return True
+    elif isinstance(d, BaseDiscreteDist):
+        return False
+    else:
+        raise TypeError(
+            "Probability distirbution must be extended from "
+            "either BaseContinousDist or BaseDiscreteDist, "
+            f"but {d.__class__.__name__}"
+        )
