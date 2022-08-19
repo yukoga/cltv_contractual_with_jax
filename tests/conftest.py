@@ -15,14 +15,13 @@
 # limitations under the License.
 # ==============================================================================
 
-
 import pytest
 import jax.numpy as jnp
 from jax import random
 from jax.scipy import stats as jstats
 
 
-N = 100  # number of samples.
+N = 200  # number of samples.
 params = {
     "mu": 1.0,  # location parameter for normal distribution.
     "sigma": 2.0,  # scale parameter for normal distribution.

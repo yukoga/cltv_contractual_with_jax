@@ -15,7 +15,6 @@
 # limitations under the License.
 # ==============================================================================
 
-
 from jax_cltv.dists.normal import (
     Normal,
     loglikelihood,
