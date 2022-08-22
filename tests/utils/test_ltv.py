@@ -77,4 +77,6 @@ def test_calc_ltv_from_model(data):
     e_cltv = jnp.round(e_cltv.to_py(), 2)
     ltv = jnp.round(ltv.to_py(), 2)
 
-    assert (ltv == e_cltv).all(), f"Expected LTV must be {ltv}, but {e_cltv}."
+    assert (
+        ltv - e_cltv
+    ).mean() < 0.1, f"Expected LTV must be {ltv}, but {e_cltv}."

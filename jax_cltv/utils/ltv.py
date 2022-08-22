@@ -29,6 +29,7 @@ def calc_ltv(y, M, d=0, s: iter = None, model=None):
         def s(t):
             theta = model.dist.params["theta"]
             for k in jnp.arange(t + 1):
+                # TODO: calc survival function with model.predict.
                 yield (1 - theta) ** k
 
     else:
