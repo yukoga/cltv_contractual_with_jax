@@ -74,9 +74,9 @@ class MLE(BaseModel):
                 return 1
 
         if is_continuous_dist(self.dist):
-            expt = (func(X) * self.dist.pdf(X)).sum()
+            expt = func(X) * self.dist.pdf(X)
         else:
-            expt = (func(X) * self.dist.pmf(X)).sum()
+            expt = func(X) * self.dist.pmf(X)
 
         return expt
 
