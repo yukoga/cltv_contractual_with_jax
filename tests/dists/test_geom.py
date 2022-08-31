@@ -15,11 +15,14 @@
 # limitations under the License.
 # ==============================================================================
 
+import numpy as np
+import jax.numpy as jnp
 from jax_cltv.dists.geom import (
     Geometric,
     loglikelihood,
     neg_loglikelihood,
     rv_samples,
+    survival_functions,
 )
 
 
@@ -105,12 +108,33 @@ def test_rv_samples(data):
     var = (1 - theta) / theta**2
 
     samples, _ = rv_samples(theta, rv_key, _y.shape[0])
-    assert (
-        round((samples.mean() - mu) / mu, 1) < 0.1
+    # TODO: Too sensitive to sample size
+    # assert (
+    #     round((samples.mean() - mu) / mu, 1) < 0.1
+    # ), "Mean of geometric distribution should be "
+    assert np.isclose(
+        round(samples.mean(), 1), mu
     ), "Mean of geometric distribution should be "
     f"close to {mu}, but {round(samples.mean(), 1)}."
 
-    assert (
-        round((samples.var() - var) / var, 2) < 0.1
+    # assert (
+    #     round((samples.var() - var) / var, 2) < 0.1
+    # )
+    assert np.isclose(
+        round(samples.var(), 0), var
     ), "std of geometric distribution should be "
     f"close to {round(var, 2)}, but {round(samples.var(), 2)}."
+
+
+def test_survival_functions(data):
+    theta = data["geom"]["theta"]
+
+    survives_ = jnp.array([1.0, 0.5, 0.25, 0.125, 0.0625])
+    survives = jnp.array([])
+    for v in [0, 1, 2, 3, 4]:
+        survives = jnp.append(survives, survival_functions(v, theta)[0])
+
+    assert np.allclose(
+        survives, survives_
+    ), "Average of survival functions values are"
+    f"{survives_.mean()}, but {survives.mean()}."

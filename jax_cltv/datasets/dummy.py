@@ -19,21 +19,50 @@
 from typing import Iterable
 import pandas as pd
 import jax.numpy as jnp
-import jax.random as random
 from jax_cltv.datasets.bases import BaseDataset
-from jax_cltv.dists.geom import rv_samples
+from jax_cltv.utils.ltv import generate_geom_samples, get_survives_from_churns
 
 
 class DummySubscriptions(BaseDataset):
     def __init__(self, rng_key=1, p=0.5, size=100, noise=None):
-        self.data = self.get_samples(rng_key, p, size, noise)
+        # self.data = self.get_samples(rng_key, p, size, noise)
+        churn_dates = self.get_samples(rng_key, p, size, noise)
+        self.data = {
+            "churn_dates": churn_dates,
+        }
 
     def to_pandas(self, columns: Iterable = None) -> pd.DataFrame:
-        df = pd.DataFrame(self.data, columns=columns)
-        if not columns:
-            df.columns = df.columns.map(lambda v: f"Day{v}")
+        df = pd.DataFrame(self.data)
+        # if not columns:
+        #     df.columns = df.columns.map(lambda v: f"Day{v}")
         return df
 
+    def load(self):
+        """
+        Abstract method for loading data from somewhere.
+        """
+        pass
+
+    def to_csv(
+        self, path="./data/cltv_synthetic.csv", columns: Iterable = None
+    ) -> None:
+        """
+        Abstract method to save data as csv file.
+        """
+        self.to_pandas(columns=columns).to_csv(path, index=False)
+
+    def get_samples(
+        self,
+        rng_key: jnp.DeviceArray,
+        p: jnp.DeviceArray,
+        size: int,
+        noise: dict = None,
+    ) -> jnp.DeviceArray:
+        details, churn_date = generate_geom_samples(rng_key, p, size, noise)
+        return churn_date.astype("int32")
+
+
+"""
     def get_samples(
         self,
         rng_key: jnp.DeviceArray,
@@ -73,17 +102,4 @@ class DummySubscriptions(BaseDataset):
                     ]
                 )
         return x.reshape(size, drtns)
-
-    def load(self):
         """
-        Abstract method for loading data from somewhere.
-        """
-        pass
-
-    def to_csv(
-        self, path="./data/cltv_synthetic.csv", columns: Iterable = None
-    ) -> None:
-        """
-        Abstract method to save data as csv file.
-        """
-        self.to_pandas(columns=columns).to_csv(path, index=False)

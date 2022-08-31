@@ -17,9 +17,11 @@
 
 from typing import Any
 import numpy as np
+import jax.numpy as jnp
 import pandas as pd
 import matplotlib.pyplot as plt
 from jax_cltv.dists.geom import Geometric
+from jax_cltv.utils.ltv import calc_ltv, get_survives_from_churns
 
 
 def plot_chart(
@@ -32,6 +34,7 @@ def plot_chart(
     color: str = None,
     alpha: float = 0.4,
     label: str = None,
+    bar_label: str = None,
     **kwargs
 ):
     if (x is None) and (y is None) and (data is None):
@@ -60,13 +63,18 @@ def plot_chart(
     elif kind == "bar":
         if N != D:
             y = y.value_counts()
-        ax.bar(x, y, alpha=alpha, label=label, color=color)
+        if bar_label:
+            bar = ax.bar(x, y, alpha=alpha, label=label, color=color)
+            ax.bar_label(bar, label_type=bar_label)
+        else:
+            ax.bar(x, y, alpha=alpha, label=label, color=color)
     else:
         ax.plot(x, y, alpha=alpha, label=label, c=color)
 
     if yscale in ("linear", "log", "symlog", "log"):
         ax.set_yscale(yscale)
 
+    ax.set_xticks(x)
     return ax
 
 
@@ -76,13 +84,14 @@ def plot_churns(
     bins: int = None,
     yscale: str = "linear",
     density: bool = False,
-    kind: str = "plot",
+    label: str = "Churns",
     style: str = "ggplot",
     figsize: tuple = (16, 9),
     alpha: float = 0.4,
     fontsize: int = 14,
     title: str = "Plot of churned users",
     ax: Any = None,
+    bar_label: str = "edge",
 ) -> plt.Axes:
     """
     Plot churned users tabular data which is in the form as follows:
@@ -125,46 +134,35 @@ def plot_churns(
     if not ax:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
-    N, D = data.shape
-    bins = D if not bins else bins
 
-    x = np.linspace(1, D, D)
-    y = data.sum(axis=1).astype("int32")
+    N = data.shape[0]
+    data = data["churn_dates"].value_counts()
+    y = jnp.append(jnp.array([0]), data.values)
+    x = jnp.append(jnp.array([0]), jnp.array(data.index))
 
-    if kind == "bar":
-        _df = pd.DataFrame({"day": x}).astype("int32")
-        data = pd.concat([_df, y.value_counts()], axis=1)
-        data.columns = ["day", "churns"]
-        data.loc[0, "churns"] = N
-        data.fillna(0, inplace=True)
-        x, y = data["day"].values, data["churns"].values
-        if density:
-            y = y / N
-        del _df
+    if density:
+        y = y / N
 
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel("Durations")
     ax.set_ylabel("# of churned users.")
-    ax.set_xticks(x)
+    # bar = ax.bar(x, y, yscale=yscale, alpha=alpha, label=label)
     ax = plot_chart(
         ax,
         x=x,
         y=y,
         yscale=yscale,
-        # kind="hist",
-        kind=kind,
+        kind="bar",
         alpha=alpha,
         density=density,
-        bins=bins,
-        label="Observed churns",
+        label=label,
+        bar_label=bar_label,
     )
-    # ax.hist(data, bins=bins, alpha=alpha, density=density)
     if theta:
         gd = Geometric(theta)
         pmf = gd.pmf(x)
         if not density:
             pmf = pmf * N
-        # ax.scatter(x, pmf, c='k')
         ax = plot_chart(
             ax,
             x=x,
@@ -173,7 +171,7 @@ def plot_churns(
             kind="scatter",
             alpha=0.9,
             color="k",
-            label="probabilty distributions (pmf)",
+            label=label + " (pmf)",
         )
 
     plt.legend()
@@ -183,8 +181,8 @@ def plot_churns(
 def plot_survives(
     data: Any,
     theta: Any = None,
-    bins: int = None,
     yscale: str = "linear",
+    label: str = "Survives",
     density: bool = False,
     style: str = "ggplot",
     figsize: tuple = (16, 9),
@@ -192,6 +190,7 @@ def plot_survives(
     fontsize: int = 14,
     title: str = "Plot of survived users",
     ax: Any = None,
+    bar_label: str = "edge",
 ) -> plt.Axes:
     """
     Plot survived users tabular data which is in the form as follows:
@@ -242,28 +241,31 @@ def plot_survives(
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111)
 
-    N, D = data.shape
-    bins = D if not bins else bins
+    N = data.shape[0]
+    y = get_survives_from_churns(data["churn_dates"])
+    x = jnp.array(range(y.shape[0]))
+    # data = data["churn_dates"].value_counts()
+    # day_max = data.index.max() + 1
+    # x = jnp.array(range(day_max))
+    # y = N - jnp.cumsum(
+    #     jnp.array([data[i] if i in data.index else 0 for i in range(day_max)])
+    # )
 
-    x = np.linspace(1, D, D)
-    data = data.sum(axis=0).astype("int32")
-    x_plot = np.insert(x[:-1], 0, 0)
     if density:
-        data = data / N
+        y = y / N
 
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel("Durations")
     ax.set_ylabel("# of survived users.")
-    # ax.bar(x, data, alpha=alpha)
-    ax.set_xticks(x_plot)
     ax = plot_chart(
         ax=ax,
-        x=x_plot,
-        y=data,
+        x=x,
+        y=y,
         yscale=yscale,
         kind="bar",
         alpha=alpha,
-        label="Observed survives",
+        label=label,
+        bar_label=bar_label,
     )
     if theta:
         gd = Geometric(theta)
@@ -275,7 +277,8 @@ def plot_survives(
             axis=0,
             ignore_index=True,
         )
-        pmf = pmf[:-1]
+        # pmf = pmf[:-1]
+        # sf = gd.sf(x)
         if not density:
             pmf = pmf["survived"] * N
         else:
@@ -283,13 +286,14 @@ def plot_survives(
         # ax.scatter(x, pmf, c='k')
         ax = plot_chart(
             ax,
-            x=x_plot,
+            x=x,
             y=pmf,
+            # y=sf,
             yscale=yscale,
             kind="scatter",
             alpha=0.9,
             color="k",
-            label="probabilty distributions (pmf)",
+            label=label + " (pmf)",
         )
 
     plt.legend()

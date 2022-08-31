@@ -77,7 +77,13 @@ class Geometric(BaseDiscreteDist):
         return jnp.ceil(
             jnp.log(random.uniform(rng_key, (size,))) / jnp.log1p(-self.theta)
         )
-        # return random.geometric(rng_key, self.a, self.b, (size,))
+
+    def logsf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
+        k = jnp.floor(x)
+        return k * jnp.log1p(-self.theta)
+
+    def sf(self, x: jnp.DeviceArray) -> jnp.DeviceArray:
+        return jnp.exp(self.logsf(x))
 
 
 def loglikelihood(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
@@ -146,3 +152,8 @@ def rv_samples(
     """
     d = Geometric(theta)
     return d.sample(rng_key, size), d
+
+
+def survival_functions(x: jnp.DeviceArray, theta: jnp.DeviceArray) -> tuple:
+    d = Geometric(theta)
+    return d.sf(x), d
