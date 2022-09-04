@@ -23,7 +23,7 @@ import jax.random as random
 from jax_cltv.dists.geom import rv_samples
 
 
-def calc_ltv(y, M, d=0, s: iter = None, model=None):
+def calc_ltv(y, M, s: iter, d=0, model=None):
     def dcf(d, t):
         for k in jnp.arange(t + 1):
             yield 1 / ((1 + d) ** k)
@@ -115,7 +115,7 @@ def generate_geom_samples(
 
 
 def get_survives_from_churns(
-    data: jnp.DeviceArray,
+    data: jnp.DeviceArray, size: int = 0
 ) -> jnp.DeviceArray:
     N = data.shape[0]
     if not isinstance(data, pd.Series):
@@ -128,6 +128,8 @@ def get_survives_from_churns(
     y = N - jnp.cumsum(
         jnp.array([data[i] if i in data.index else 0 for i in range(day_max)])
     )
+    if size > y.shape[0]:
+        y = jnp.pad(y, (0, size - y.shape[0]))
     return y
     # return jnp.append(jnp.array([N]), N - jnp.cumsum(counts))
     # x = generate_geom_survive_flags(arr_unsuccess)
