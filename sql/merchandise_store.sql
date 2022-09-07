@@ -11,6 +11,11 @@ WITH config AS (
         event_date
         , event_timestamp
         , user_pseudo_id AS visitor_id
+        , CONCAT(user_pseudo_id, '-',
+            CAST(
+                FIRST_VALUE(event_timestamp) 
+                    OVER (PARTITION BY user_pseudo_id ORDER BY event_timestamp ASC)
+                    AS STRING)) AS session_id
         , user_id
         , event_name
         , MAX(CASE WHEN ev_params.key = 'ga_session_number' THEN ev_params.value.int_value    END) AS session_number
@@ -38,14 +43,29 @@ WITH config AS (
 )
 
 SELECT
-REGEXP_EXTRACT(page_location, r'utm_source=([0-1a-zA-Z_\-]+)') AS ext,
--- REGEXP_EXTRACT(page_location, r'(&|\?)utm_source=(.*)') AS ext,
-*
+    source_medium,
+    COUNT(DISTINCT session_id) AS sessions
+-- REGEXP_EXTRACT(page_location, r'utm_source=([0-1a-zA-Z_\-]+)') AS ext,
+-- -- REGEXP_EXTRACT(page_location, r'(&|\?)utm_source=(.*)') AS ext,
+-- *
 FROM (
-SELECT *, REGEXP_CONTAINS(page_location, r'(&|\?)utm_source=(.*)') AS pl
+SELECT session_id,
+    CASE 
+        WHEN REGEXP_CONTAINS(page_location, r'(&|\?)dclid=(.*)') THEN 'dv360 / cpm'
+        WHEN REGEXP_CONTAINS(page_location, r'(&|\?)gclid=(.*)') THEN 'google / cpc'
+        WHEN REGEXP_CONTAINS(page_location, r'utm_source=([0-1a-zA-Z_\-]+)') THEN 
+            CONCAT(REGEXP_EXTRACT(page_location, r'utm_source=([0-1a-zA-Z_\-]+)', 1), ' / ',
+                    REGEXP_EXTRACT(page_location, r'utm_medium=([0-1a-zA-Z_\-]+)', 1))
+        WHEN event_source IS NOT NULL THEN CONCAT('session: ', event_source, ' / ', event_medium)
+        WHEN user_source IS NOT NULL THEN CONCAT('user: ', user_source, ' / ', user_medium)
+        ELSE 'direct / none'
+    END AS source_medium
 FROM base
 )
-WHERE pl
+WHERE source_medium IS NOT NULL
+GROUP BY source_medium
+ORDER BY sessions DESC
+
 -- WHERE visitor_id = '1812133135.1616800146'
 
 -- SELECT * FROM (
